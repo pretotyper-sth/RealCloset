@@ -12,9 +12,9 @@ export default function FeedItems({ look, onOpen }) {
     {items.map(item => <button type="button" key={item.id} className="rc-feed-item" onClick={onOpen} aria-label={`${item.name || '아이템'} · 아이템 목록 보기`}>
       <span className="rc-feed-item-image">{item.img ? <img src={item.img} alt="" loading="lazy" draggable={false}/> : <Icon name="hanger" size={24}/>}</span>
       <span className="rc-feed-item-copy">
-        {item.brand && <small>{item.brand}</small>}
+        <small aria-hidden={!item.brand || undefined}>{item.brand || ''}</small>
         <span className="rc-feed-item-name">{item.name || item.category || '아이템'}</span>
-        {!!item.price && <strong>{outfitPrice(item.price)}</strong>}
+        <strong aria-hidden={!item.price || undefined}>{item.price ? outfitPrice(item.price) : ''}</strong>
       </span>
     </button>)}
   </div>;

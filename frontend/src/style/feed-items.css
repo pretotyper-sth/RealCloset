@@ -46,8 +46,10 @@
 }
 
 .rc-feed-item-copy {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 14px 17px 17px;
+  align-content: center;
+  flex: 1;
   gap: var(--s1);
   min-width: 0;
   font-size: 12px;
