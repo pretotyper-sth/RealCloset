@@ -1316,6 +1316,7 @@ function AddSheet({ ctx }) {
     && (import.meta.env.DEV || new URLSearchParams(window.location.search).get('orderPreview') === '1');
   const mobileOrderTab = tab === 'orders' && !wide;
   const orderBrowser = orderExtensionBrowser();
+  const orderExtensionPending = !orderBrowser.storeUrl && !orderInstallPreview;
   const [orderFlow, setOrderFlow] = useS({ phase: 'idle', shopId: '', demo: false, count: 0 });
   const orderDraftRef = useR({ bulk: null, result: null });
   const previewUrlRef = useR('');
@@ -1823,7 +1824,7 @@ function AddSheet({ ctx }) {
       return;
     }
     if (!orderBrowser.storeUrl) {
-      setErr('확장 프로그램 설치를 준비 중이에요.');
+      setErr('웹스토어 심사 중이에요. 승인 후 설치할 수 있어요.');
       return;
     }
     window.open(orderBrowser.storeUrl, '_blank', 'noopener');
@@ -2940,10 +2941,10 @@ function AddSheet({ ctx }) {
                         ) : (orderExtension === 'missing' || orderExtension === 'outdated') && !storeRequestOpen ? (
                           <>
                             <div style={{ fontSize: 13.5, fontWeight: 750, lineHeight: 1.4 }}>
-                              {orderExtension === 'outdated' ? '확장 프로그램 업데이트가 필요해요' : `${orderBrowser.name} 확장 프로그램을 먼저 설치해 주세요`}
+                              {orderExtensionPending ? '구매내역 불러오기를 준비하고 있어요' : orderExtension === 'outdated' ? '확장 프로그램 업데이트가 필요해요' : `${orderBrowser.name} 확장 프로그램을 먼저 설치해 주세요`}
                             </div>
                             <div style={{ marginTop: 5, fontSize: 12.5, color: 'var(--ink-2)', lineHeight: 1.4 }}>
-                              한 번 설치하면 바로 불러와요.
+                              {orderExtensionPending ? '웹스토어 승인 후 이곳에서 설치할 수 있어요.' : '한 번 설치하면 바로 불러와요.'}
                             </div>
                             <div style={{ display: 'grid', gap: 7, marginTop: 14 }}>
                               {[
@@ -3306,8 +3307,8 @@ function AddSheet({ ctx }) {
                           사진으로 추가하기
                         </Btn>
                       ) : tab === 'orders' && (orderExtension === 'missing' || orderExtension === 'outdated') ? (
-                        <Btn full size="lg" icon="bag" onClick={openOrderExtensionInstall}>
-                          {orderExtension === 'outdated' ? '확장 프로그램 업데이트하기' : '확장 프로그램 설치하기'}
+                        <Btn full size="lg" icon="bag" disabled={orderExtensionPending} onClick={openOrderExtensionInstall}>
+                          {orderExtensionPending ? '웹스토어 심사 중' : orderExtension === 'outdated' ? '확장 프로그램 업데이트하기' : '확장 프로그램 설치하기'}
                         </Btn>
                       ) : (
                         <Btn

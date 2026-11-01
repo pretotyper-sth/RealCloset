@@ -70,7 +70,7 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [auth-recovery-keepalive](auth-recovery-keepalive.md) — Supabase 중지 복구·로그인 네트워크 오류·비밀번호 재설정·랜딩 이미지 전환·6시간 DB 연결 확인 · 운영 SMTP 발신자명/재설정 메일 REALCLOSET 표기 저장·재조회 완료(2026-10-25)
 - [mobile-editing-audit-2026-10](mobile-editing-audit-2026-10.md) — 모바일 문구/공개 설정/AI 배지/CTA/피드 오류/편집기 수정·DEV 라이브 누락 점검·직접 입혀보기 영구 작업 서버 필요·사용자 푸시 승인
 - [ai-usage-cost](ai-usage-cost.md) — 2026-10-14 감사: 417건 중 207건 비용 미기록·저장 $16.906021은 청구 총액 아님. 착장/기준인물/제안 이미지 누락·단가표 불일치
-- [chrome-extension-publish](chrome-extension-publish.md) — 0.3.46 설치 자동 감지/도구 모음 진입/등록 ZIP 준비·Chrome 연결 복구·native 스토어 작업 대기/등록·스토어 주소 연결 미완료. 웹스토어 게시자명·연락처는 공개. REALCLOSET 전용 Google 계정, 등록비·2FA·Privacy practices 필요
+- [chrome-extension-publish](chrome-extension-publish.md) — 0.3.46 CWS 심사 제출 완료(검토 대기/승인 후 자동 게시)·설치 자동 감지/도구 모음 진입·승인 후 설치 링크 환경 변수 활성화 필요. 웹스토어 게시자명·연락처는 공개. REALCLOSET 전용 Google 계정, 등록비·2FA·Privacy practices 필요
 - [vercel-github-silent](vercel-github-silent.md) — 푸시 메일은 vercel[bot] 댓글. `github.silent`로 댓글만 끈다
 - [stale-vite-chunk](stale-vite-chunk.md) — 배포 후 열린 탭의 이전 해시 청크가 404면 Vite preload 오류에서 탭당 한 번 새로고침
 

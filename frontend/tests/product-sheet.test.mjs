@@ -45,7 +45,7 @@ test('shared item details show recorded fields and context-appropriate actions',
     assert.ok(emptyItems.includes('등록한 아이템이 없어요'));
     const itemStrip = renderToStaticMarkup(React.createElement(FeedItems, { look: { items: [item, item, { id: 'pants', category: '하의' }] }, onOpen() {} }));
     assert.equal((itemStrip.match(/class="rc-feed-item"/g) || []).length, 2);
-    assert.ok(itemStrip.includes('<small aria-hidden="true"></small><span class="rc-feed-item-name">하의</span><strong aria-hidden="true"></strong>'));
+    assert.ok(itemStrip.includes('<small>브랜드 미등록</small><span class="rc-feed-item-name">하의</span><strong class="rc-feed-item-missing">가격 미등록</strong>'));
   } finally {
     await server.close();
     delete global.window;
