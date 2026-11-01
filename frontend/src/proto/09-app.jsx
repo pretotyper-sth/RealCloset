@@ -2049,21 +2049,7 @@ function App() {
     }
   }, [prefs.gender, prefs.personalModelLook, prefs.avatar, prefs.height, prefs.weight, dailyStyle, items, bumpDaily, reloadBilling]);
 
-  // refreshLive로 코디만 채워지면 dailyAllowed=true라 오늘 탭이 request를 스킵한다.
-  // 그때 applyModelLooks가 안 타서 착장 토글이 켜져 있어도 옷 컷아웃만 보였다.
-  useEffect(() => {
-    if (isShowcase || !authUid || !wardrobeLoaded || !prefs.modelLook || !prefs.dailyEnabled || dailyPipelineRef.current) return;
-    if (lookInflight.current.size > 0) return;
-    const lookLimit = 1;
-    const have = (LB_DATA.DAILY || []).filter((o) => o && o.lookImg).length;
-    if (lookLimit > 0 && have >= lookLimit) return;
-    const pending = (LB_DATA.DAILY || []).filter((o) => (
-      o && !o.lookImg && (o.itemIds || []).length && o.id
-      && !lookInflight.current.has(o.id) && !outfitWishPending(o)
-    ));
-    if (!pending.length) return;
-    applyModelLooks(pending).catch((e) => showToast(e.message || 'AI 착장 이미지를 만들지 못했어요'));
-  }, [isShowcase, authUid, wardrobeLoaded, prefs.modelLook, prefs.dailyEnabled, dailyTick, applyModelLooks, showToast]);
+  // 페이지 진입과 저장 코디 복원은 새 AI 이미지를 생성하지 않는다.
 
   const [pickedLookSettings, setPickedLookSettings] = useState(() => readPickedLookSettings(authUid));
   useEffect(() => { setPickedLookSettings(readPickedLookSettings(authUid)); }, [authUid]);
@@ -2158,9 +2144,6 @@ function App() {
         setDailyStyle((cached && cached.style) || style);
         setDailyAllowed(true);
         bumpDaily();
-        if (prefs.modelLook && LB_DATA.DAILY.some((o) => !o.lookImg)) {
-          applyModelLooks(LB_DATA.DAILY.filter((o) => !o.lookImg));
-        }
         return { added: 0, wardrobeGrew, fromCache: true };
       }
       const cached = readDailyCache();
@@ -2183,9 +2166,6 @@ function App() {
           setDailyStyle(cached.style || style);
           setDailyAllowed(true);
           bumpDaily();
-          if (prefs.modelLook && outfits.some((o) => !o.lookImg)) {
-            applyModelLooks(outfits.filter((o) => !o.lookImg));
-          }
           return { added: 0, wardrobeGrew, fromCache: true };
         }
         clearDailyCache();
