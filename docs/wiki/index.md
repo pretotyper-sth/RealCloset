@@ -92,3 +92,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [feed-ux-2026-11](feed-ux-2026-11.md) — 192px 고정 폭/브랜드·이름·가격 고정 행 자유 스크롤·PC 아이템0개 영역/반응 버튼 정렬·텍스트 공통 높이/16색/한 줄 도구·공개 옷 정렬/즉시 전환/중복 저장 제거·날짜 날씨 전체 스크롤·피드 공통 배경/제목·복원 자동AI 호출 제거/스켈레톤/공개 옷 정보 시트·문구 변경 전체 목록·탐색 원문 복원·내 스타일로 재구성하기 통일/허용 설정 UI 없음 확인
 
 - 피드 아이템 누락 정보: [design-system](design-system.md) — 브랜드·가격 미등록 보조 문구로 고정 행의 공백 제거.
+
+- 세션 만료 오표시: [auth-recovery-keepalive](auth-recovery-keepalive.md) — 인증 통신 장애는 503, 명시적 인증 거절만 401. 운영 만료 값 확인 대기.

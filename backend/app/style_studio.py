@@ -147,11 +147,11 @@ def owner(request: Request, x_studio_owner: str = Header(default='')):
     if os.environ.get('STYLE_STUDIO_LOCAL') != '1':
         authorization = request.headers.get('authorization', '')
         if authorization.lower().startswith('bearer '):
-            from .main import supabase_user
+            from .main import supabase_user, authentication_error
             try:
                 user = supabase_user.auth.get_user(authorization.split(' ', 1)[1]).user
             except Exception as exc:
-                raise HTTPException(401, '로그인이 만료됐어요. 다시 로그인해 주세요.') from exc
+                raise authentication_error(exc) from exc
             if not user:
                 raise HTTPException(401, '로그인이 필요해요.')
             request.state.studio_user_id = user.id

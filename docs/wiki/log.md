@@ -1432,3 +1432,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-01: 무신사 스냅 상세 확인 후 FeedItems 빈 브랜드·가격 행을 짧은 미등록 문구로 대체. `frontend/src/style/feed-items.jsx:16`, `feed-items.css` 참조.
 
 - 2026-11-01: CWS0.3.46 신규 항목 lkajnibihdnoiogalhngecodcpkjlobc 업로드/메타데이터·이미지·개인정보·심사 안내 제출, 검토 대기 중 확인. 승인 후 자동 게시 설정. 설치 링크는 승인 후 환경 변수 활성화하도록 보류하고 앱에 심사 중 상태 표시. [[chrome-extension-publish]].
+
+- 2026-11-01: live/studio 인증 통신 장애를 만료(401)와 구분(503). 인증 오류 분류 테스트 통과. 운영 세션 설정 확인은 로그인 접근 차단으로 미완료.

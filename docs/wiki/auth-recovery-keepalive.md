@@ -53,3 +53,7 @@ Supabase realcloset의 Authentication → Emails → Reset password에서 제목
 - 다른 화면으로 이동한 뒤 템플릿을 다시 열어 제목·본문·저장 버튼 비활성 상태와 미리보기를 확인했다. 운영 본문은 `supabase/templates/recovery.html`, 제목은 `supabase/templates/recovery.subject.txt`와 일치한다. 이 파일들은 운영 설정을 복원할 원본이며 Git 푸시만으로 Supabase 설정에 자동 반영되지는 않는다.
 - Confirm sign up, Invite user, Magic link or OTP, Change email address, Reauthentication의 로드된 제목/본문에 혼합 대소문자 제품명이 없는 것을 확인했다. 메일 기능 활성화 설정은 변경하지 않았다.
 - 실제 메일 발송과 비밀번호 변경은 수행하지 않았다.
+
+## 2026-11-01 인증 오류 분류
+
+`backend/app/main.py`의 `authentication_error`를 live/studio에서 공유한다. 인증 서비스의 명시적 400/401/403만 401로 반환하고 통신/429/5xx는 503으로 반환해 잘못된 만료 안내와 불필요한 토큰 갱신을 막는다. `backend/tests/test_authentication_error.py` 검증 통과. 프런트는 persistSession/autoRefreshToken=true이며 401일 때 계정 토큰 갱신 후 한 번 재시도한다. 운영 JWT/세션 timebox/inactivity 값은 대시보드 로그인 접근 차단으로 확인하지 못했다. 제안: access token 1시간, inactivity 30일, absolute 90일. 미적용이며 요금제 지원 확인 필요.

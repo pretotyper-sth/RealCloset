@@ -369,6 +369,14 @@ def require_supabase() -> None:
         raise HTTPException(status_code=500, detail="서버 설정이 아직 안 됐어요. 잠시 후 다시 시도해 주세요.")
 
 
+def authentication_error(exc: Exception) -> HTTPException:
+    # Only explicit credential rejection means expiry; outages must preserve sessions.
+    status = getattr(exc, 'status', None) or getattr(exc, 'status_code', None)
+    if str(status) in ('400', '401', '403'):
+        return HTTPException(status_code=401, detail="로그인이 만료됐어요. 다시 로그인해 주세요.")
+    return HTTPException(status_code=503, detail="로그인 상태를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.")
+
+
 async def current_user(authorization: str | None = Header(default=None)) -> UserContext:
     if not authorization or not authorization.lower().startswith("bearer "):
         raise HTTPException(status_code=401, detail="로그인이 필요해요.")
@@ -377,7 +385,7 @@ async def current_user(authorization: str | None = Header(default=None)) -> User
         result = supabase_user.auth.get_user(token)
         user = result.user
     except Exception as exc:
-        raise HTTPException(status_code=401, detail="로그인이 만료됐어요. 다시 로그인해 주세요.") from exc
+        raise authentication_error(exc) from exc
     if not user:
         raise HTTPException(status_code=401, detail="로그인이 만료됐어요. 다시 로그인해 주세요.")
     upsert_profile(user.id, user.email)
