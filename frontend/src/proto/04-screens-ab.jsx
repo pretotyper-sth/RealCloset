@@ -1302,7 +1302,6 @@ function AddSheet({ ctx }) {
   const [orderExtImage, setOrderExtImage] = useS(false);
   const [orderPreviewItems, setOrderPreviewItems] = useS([]);
   const [orderExtension, setOrderExtension] = useS('checking');
-  const [orderInstallPending, setOrderInstallPending] = useS(false);
   const [orderStorePreview, setOrderStorePreview] = useS('');
   const [orderPreviewSession, setOrderPreviewSession] = useS(false);
   const [storeRequestOpen, setStoreRequestOpen] = useS(false);
@@ -1805,7 +1804,7 @@ function AddSheet({ ctx }) {
       setOrderExtension('demo');
       return;
     }
-    setOrderExtension('checking');
+    setOrderExtension(current => current === 'ready' ? current : 'checking');
     extCall({ type: 'PING' }, 700)
       .then((ping) => {
         const ready = !!(ping && ping.ok);
@@ -1823,8 +1822,10 @@ function AddSheet({ ctx }) {
       setOrderStorePreview('store');
       return;
     }
-    if (!orderBrowser.storeUrl) return;
-    setOrderInstallPending(true);
+    if (!orderBrowser.storeUrl) {
+      setErr('확장 프로그램 설치를 준비 중이에요.');
+      return;
+    }
     window.open(orderBrowser.storeUrl, '_blank', 'noopener');
   };
   const completeOrderInstallPreview = (next) => {
@@ -1839,14 +1840,24 @@ function AddSheet({ ctx }) {
     setErr('');
   };
   useE(() => {
-    if (!orderInstallPending) return undefined;
+    if (tab !== 'orders' || !addSheet.open) return undefined;
     const checkAfterInstall = () => {
-      setOrderInstallPending(false);
       checkOrderExtension();
     };
-    window.addEventListener('focus', checkAfterInstall, { once: true });
-    return () => window.removeEventListener('focus', checkAfterInstall);
-  }, [orderInstallPending]);
+    const onExtensionReady = (event) => {
+      if (event.source === window && event.origin === window.location.origin && event.data?.source === 'lookbox-ext' && event.data.type === 'ready') checkAfterInstall();
+    };
+    const onVisible = () => { if (document.visibilityState === 'visible') checkAfterInstall(); };
+    checkOrderExtension();
+    window.addEventListener('focus', checkAfterInstall);
+    window.addEventListener('message', onExtensionReady);
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.removeEventListener('focus', checkAfterInstall);
+      window.removeEventListener('message', onExtensionReady);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [tab, addSheet.open]);
   const URL_ROW_MAX = 20;
   const setUrlAt = (idx, value) => {
     setUrls((prev) => prev.map((u, i) => (i === idx ? value : u)));

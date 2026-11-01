@@ -977,7 +977,12 @@ function App() {
     return LB_DATA.SAVED.slice();
   });
   const [lookbookLoading, setLookbookLoading] = useState(() => !isShowcase && !readLookbookCache());
-  const [addSheet, setAddSheet] = useState({ open: pScreen === 'add' || !!pSheet, mode: pSheet || 'wardrobe' });
+  const [addSheet, setAddSheet] = useState({ open: pScreen === 'add' || !!pSheet || param('add') === 'orders', mode: pSheet || 'wardrobe', initialSourceTab: param('add') === 'orders' ? 'orders' : undefined });
+  useEffect(() => {
+    const openOrders = event => { event.preventDefault(); setAddSheet({ open: true, mode: 'wardrobe', initialSourceTab: 'orders' }); };
+    window.addEventListener('rc-open-orders', openOrders);
+    return () => window.removeEventListener('rc-open-orders', openOrders);
+  }, []);
   const [loading, setLoading] = useState(pLoading);
   const [moreLoading, setMoreLoading] = useState(false);
   const [comboRev, setComboRev] = useState(0);

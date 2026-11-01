@@ -39,6 +39,13 @@ test('shared item details show recorded fields and context-appropriate actions',
     assert.equal((skeleton.match(/rc-feed-skeleton-card/g) || []).length, 4);
     assert.ok(skeleton.includes('role="status"'));
     assert.ok(!skeleton.includes('>저장한 피드를 불러오는 중<'));
+    const { default: FeedItems } = await server.ssrLoadModule('/src/style/feed-items.jsx');
+    const emptyItems = renderToStaticMarkup(React.createElement(FeedItems, { look: { items: [] }, onOpen() {} }));
+    assert.ok(emptyItems.includes('rc-feed-items-empty'));
+    assert.ok(emptyItems.includes('등록한 아이템이 없어요'));
+    const itemStrip = renderToStaticMarkup(React.createElement(FeedItems, { look: { items: [item, item, { id: 'pants', category: '하의' }] }, onOpen() {} }));
+    assert.equal((itemStrip.match(/class="rc-feed-item"/g) || []).length, 2);
+    assert.ok(itemStrip.includes('<small aria-hidden="true"></small><span class="rc-feed-item-name">하의</span><strong aria-hidden="true"></strong>'));
   } finally {
     await server.close();
     delete global.window;

@@ -57,6 +57,9 @@
   .rc-feed-social .rc-feed-items{order:2}
   .rc-feed-social .rc-post-actions{order:3;padding:0;gap:4px}
   .rc-feed-social .rc-post-caption{order:4;padding:4px 0 0}
+  .rc-feed-social .rc-post-caption{min-height:88px}
+  .rc-feed-social .rc-post-caption>p{min-height:3.1em}
+  .rc-feed-social .rc-post-caption>.rc-post-likes{display:block;min-height:17px;line-height:17px;margin-bottom:4px}
   .rc-feed-social .rc-post-caption p{font-size:13px;margin:0}
   .rc-feed-social .rc-post-avatar{width:28px;height:28px}
   .rc-feed-social .rc-post-person{font-size:12px;gap:8px}

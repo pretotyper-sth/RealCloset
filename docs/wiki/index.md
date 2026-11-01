@@ -70,7 +70,7 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [auth-recovery-keepalive](auth-recovery-keepalive.md) — Supabase 중지 복구·로그인 네트워크 오류·비밀번호 재설정·랜딩 이미지 전환·6시간 DB 연결 확인 · 운영 SMTP 발신자명/재설정 메일 REALCLOSET 표기 저장·재조회 완료(2026-10-25)
 - [mobile-editing-audit-2026-10](mobile-editing-audit-2026-10.md) — 모바일 문구/공개 설정/AI 배지/CTA/피드 오류/편집기 수정·DEV 라이브 누락 점검·직접 입혀보기 영구 작업 서버 필요·사용자 푸시 승인
 - [ai-usage-cost](ai-usage-cost.md) — 2026-10-14 감사: 417건 중 207건 비용 미기록·저장 $16.906021은 청구 총액 아님. 착장/기준인물/제안 이미지 누락·단가표 불일치
-- [chrome-extension-publish](chrome-extension-publish.md) — 웹스토어 게시자명·연락처는 공개. REALCLOSET 전용 Google 계정, 등록비·2FA·Privacy practices 필요
+- [chrome-extension-publish](chrome-extension-publish.md) — 0.3.46 설치 자동 감지/도구 모음 진입/등록 ZIP 준비·Chrome 연결 차단으로 등록/스토어 주소 연결 미완료. 웹스토어 게시자명·연락처는 공개. REALCLOSET 전용 Google 계정, 등록비·2FA·Privacy practices 필요
 - [vercel-github-silent](vercel-github-silent.md) — 푸시 메일은 vercel[bot] 댓글. `github.silent`로 댓글만 끈다
 - [stale-vite-chunk](stale-vite-chunk.md) — 배포 후 열린 탭의 이전 해시 청크가 404면 Vite preload 오류에서 탭당 한 번 새로고침
 
@@ -89,4 +89,4 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 
 - [profile-face-pose-2026-10](profile-face-pose-2026-10.md) — 프로필 얼굴 특징·촬영 각도 분리, 자연스러운 전신 포즈 참조, 바로보기 마스크 보호 및 롤백 기준
 
-- [feed-ux-2026-11](feed-ux-2026-11.md) — 고정 폭/브랜드·이름·가격 고정 행 자유 스크롤·텍스트 공통 높이/16색/한 줄 도구·공개 옷 정렬/즉시 전환/중복 저장 제거·날짜 날씨 전체 스크롤·피드 공통 배경/제목·복원 자동AI 호출 제거/스켈레톤/공개 옷 정보 시트·문구 변경 전체 목록·탐색 원문 복원·내 스타일로 재구성하기 통일/허용 설정 UI 없음 확인
+- [feed-ux-2026-11](feed-ux-2026-11.md) — 192px 고정 폭/브랜드·이름·가격 고정 행 자유 스크롤·PC 아이템0개 영역/반응 버튼 정렬·텍스트 공통 높이/16색/한 줄 도구·공개 옷 정렬/즉시 전환/중복 저장 제거·날짜 날씨 전체 스크롤·피드 공통 배경/제목·복원 자동AI 호출 제거/스켈레톤/공개 옷 정보 시트·문구 변경 전체 목록·탐색 원문 복원·내 스타일로 재구성하기 통일/허용 설정 UI 없음 확인

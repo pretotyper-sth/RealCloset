@@ -6,7 +6,7 @@
   padding: var(--s3) var(--s1);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  scrollbar-width: thin;
+  scrollbar-width: none;
   touch-action: pan-x pan-y;
 }
 
@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   gap: var(--s2);
-  flex: 0 0 212px;
+  flex: 0 0 192px;
   min-width: 0;
   padding: 0;
   border: 0;
@@ -70,6 +70,26 @@
 
 .rc-feed-item-copy strong {
   font-weight: 650;
+}
+
+.rc-feed-items-empty {
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .rc-feed-items {
+    height: 88px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  .rc-feed-items-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 759px) {

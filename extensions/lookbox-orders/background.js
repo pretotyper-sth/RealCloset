@@ -1,4 +1,4 @@
-import { PLATFORMS, byId } from './platforms.js';
+import { byId } from './platforms.js';
 import {
   pageAccessDenied,
   pageHasNoOrders,
@@ -69,6 +69,18 @@ chrome.runtime.onInstalled.addListener(async () => {
   for (const tab of tabs) {
     if (!tab.id) continue;
     await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['lookbox-bridge.js'] }).catch(() => {});
+  }
+});
+
+chrome.action.onClicked.addListener(async () => {
+  const tabs = await chrome.tabs.query({ url: 'https://realcloset.vercel.app/*' });
+  const tab = tabs.sort((a, b) => (b.lastAccessed || 0) - (a.lastAccessed || 0))[0];
+  if (tab?.id) {
+    await returnToLookbox(tab.id);
+    const reply = await chrome.tabs.sendMessage(tab.id, { type: 'LOOKBOX_OPEN_ORDERS' }).catch(() => null);
+    if (!reply?.opened) await chrome.tabs.update(tab.id, { url: 'https://realcloset.vercel.app/?tab=wardrobe&add=orders' });
+  } else {
+    await chrome.tabs.create({ url: 'https://realcloset.vercel.app/?tab=wardrobe&add=orders' });
   }
 });
 
@@ -515,7 +527,7 @@ async function collectPlatform(platform, previousTabId, emit, lookboxTabId) {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (!msg || !msg.type || !sender.tab || !LOOKBOX_ORIGIN.test(sender.tab.url || '')) return;
   if (msg.type === 'PING') {
-    sendResponse({ ok: true, version: '0.3.45' });
+    sendResponse({ ok: true, version: chrome.runtime.getManifest().version });
     return;
   }
   if (msg.type === 'CANCEL') {
@@ -533,7 +545,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg.type === 'OPEN' || msg.type === 'COLLECT') {
-    const platform = byId(msg.platform) || PLATFORMS[0];
+    const platform = byId(msg.platform);
+    if (!platform) {
+      sendResponse({ status: 'error', error: '쇼핑몰을 다시 선택해 주세요.' });
+      return;
+    }
     const emit = (event) => {
       chrome.tabs.sendMessage(sender.tab.id, {
         type: 'LOOKBOX_ORDER_EVENT',
