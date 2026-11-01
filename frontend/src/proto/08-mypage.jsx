@@ -1,6 +1,6 @@
 /* @prototype-ported */
 const React = window.React;
-const { BottomSheet, Btn, Chip, Icon, LB_DATA, LabeledField, NumberSlider, PALETTE, PERSONAL_COLORS, STYLES } = window;
+const { BottomSheet, Btn, Chip, Icon, LB_DATA, LabeledField, NumberSlider, PALETTE, PERSONAL_COLORS, STYLES, SocialLoginButtons } = window;
 
 /* global React, Btn, Icon, Chip, BottomSheet, LabeledField, LB_DATA */
 // REALCLOSET — 마이페이지: 개인 정보(계정) + 내 스타일(취향) 허브. 실서비스 IA 기준.
@@ -838,6 +838,11 @@ function AccountEditSheet({ open, prefs, onClose, onSave, onChangePassword }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             <NumberSlider label="키" hint="선택 · 비워둬도 돼요" value={d.height} onChange={set('height')} min={140} max={200} unit="cm" defaultValue={165} />
             <NumberSlider label="몸무게" hint="선택 · 비워둬도 돼요" value={d.weight} onChange={set('weight')} min={30} max={150} unit="kg" defaultValue={60} />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>로그인 연결</div>
+            <p style={{ fontSize: 12, color: 'var(--ink-3)', margin: '0 0 12px' }}>연결 후에도 지금 계정의 옷장과 기록을 그대로 써요.</p>
+            <SocialLoginButtons link />
           </div>
           <div style={{ borderTop: '1px solid var(--line)', paddingTop: 6 }}>
             <button type="button" onClick={() => setView('password')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '14px 0', border: 0, borderBottom: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)', cursor: 'pointer', textAlign: 'left' }}>

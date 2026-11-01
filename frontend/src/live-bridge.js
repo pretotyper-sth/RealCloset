@@ -11,6 +11,9 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
 const configured = Boolean(API_BASE && SUPABASE_URL && SUPABASE_ANON_KEY)
 
+const socialParams = new URLSearchParams(window.location.search)
+const socialCallbackFailed = socialParams.get('auth') === 'social' && (socialParams.has('error') || new URLSearchParams(window.location.hash.slice(1)).has('error'))
+
 const recoveryParams = new URLSearchParams(window.location.hash.slice(1))
 const recoveryRequested = new URLSearchParams(window.location.search).get('reset') === '1' || recoveryParams.get('type') === 'recovery'
 let recoveryUser = ''
@@ -75,6 +78,8 @@ function authError(error) {
   if (/failed to fetch|fetch failed|network|load failed/i.test(msg)) return '인증 서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'
   if (/same_password/i.test(error?.code || '') || /different from the old password/i.test(msg)) return '기존 비밀번호와 다른 비밀번호를 입력해 주세요.'
   if (/otp_expired|session_not_found/i.test(error?.code || '')) return '재설정 링크가 만료되었어요. 메일을 다시 요청해 주세요.'
+  if (/provider.*not enabled|unsupported provider|manual linking.*disabled/i.test(msg)) return '로그인 연동을 준비 중이에요. 기존 이메일로 로그인해 주세요.'
+  if (/identity_already_exists|identity_already_linked/i.test(error?.code || '')) return '이미 다른 계정에 연결돼 있어요. 기존 로그인으로 접속해 주세요.'
   if (/already registered|already been registered/i.test(msg)) return '이미 가입된 이메일이에요. 로그인해 주세요.'
   if (/Invalid login credentials/i.test(msg)) return '이메일 또는 비밀번호가 맞지 않아요.'
   if (/Email not confirmed/i.test(msg)) return '이메일 인증이 필요해요. 메일함을 확인해 주세요.'
@@ -130,6 +135,7 @@ const auth = {
       id: user.id,
       email: user.email || '',
       anonymous: !!user.is_anonymous,
+      providers: (user.identities || []).map(identity => identity.provider),
       prefs: (user.user_metadata && user.user_metadata.prefs) || null,
     }
   },
@@ -154,28 +160,27 @@ const auth = {
       return { error: '비밀번호를 변경하지 못했어요. 잠시 후 다시 시도해 주세요.' }
     }
   },
-  // 가입은 Supabase의 signUp을 쓰지 않는다. 확인 메일이 필요한 가입은 기본 메일
-  // 발송 한도(시간당 몇 통)에 걸려 'email rate limit'으로 막히고, 그 순간 계정이
-  // 아예 만들어지지 않는다. 백엔드가 서비스 롤로 확인된 계정을 만들어 주고,
-  // 우리는 바로 로그인해 세션을 얻는다.
-  async signUp(email, password) {
+  // 이메일 가입은 닫고 기존 계정의 로그인·복구만 유지한다.
+  async signInSocial(provider, { link = false } = {}) {
     if (!supabase) return { error: '서버 설정이 없어요.' }
-    let res
+    if (!['google', 'kakao'].includes(provider)) return { error: '로그인 수단을 확인해 주세요.' }
     try {
-      res = await fetch(`${API_BASE}/api/live/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      })
-    } catch {
-      return { error: '네트워크 연결이 불안정해요. 잠시 후 다시 시도해 주세요.' }
-    }
-    if (!res.ok) {
-      let detail = ''
-      try { detail = (await res.json()).error || '' } catch { /* 본문 없음 */ }
-      return { error: detail || '가입을 처리하지 못했어요.' }
-    }
-    return auth.signIn(email, password)
+      const redirect = new URL(window.location.pathname, window.location.origin)
+      redirect.searchParams.set('auth', 'social')
+      const options = { redirectTo: redirect.href }
+      if (provider === 'google') options.queryParams = { prompt: 'select_account' }
+      if (link) {
+        const { data, error } = await supabase.auth.getUser()
+        if (error || !data.user || data.user.is_anonymous) return { error: '기존 계정으로 먼저 로그인해 주세요.' }
+      }
+      const { error } = link
+        ? await supabase.auth.linkIdentity({ provider, options })
+        : await supabase.auth.signInWithOAuth({ provider, options })
+      return { error: error ? authError(error) : '' }
+    } catch (error) { return { error: authError(error) } }
+  },
+  get socialError() {
+    return socialCallbackFailed ? '로그인을 완료하지 못했어요. 다시 시도해 주세요.' : ''
   },
   async signIn(email, password) {
     if (!supabase) return { error: '서버 설정이 없어요.' }

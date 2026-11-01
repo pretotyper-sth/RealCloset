@@ -1029,15 +1029,10 @@ function App() {
   // 계정 설정이 도착하기 전에 사용자가 바꾼 값은 계정 값으로 되돌리지 않는다.
   const prefsAtBoot = useRef(null);
   setDailyScope(authUid); // 코디 캐시 키를 현재 계정으로 고정 — 렌더 중 읽는 곳이 있어 effect보다 먼저 세팅한다
-  const prevAuthUid = useRef('');
   useEffect(() => {
     Object.keys(serverDailyHistory).forEach((k) => { delete serverDailyHistory[k]; });
     if (!authUid) return;
     migrateDailyHistory('anon', authUid);
-    if (prevAuthUid.current && prevAuthUid.current !== authUid) {
-      migrateDailyHistory(prevAuthUid.current, authUid);
-    }
-    prevAuthUid.current = authUid;
     try { localStorage.setItem(LAST_UID_KEY, authUid); } catch (e) { /* noop */ }
   }, [authUid]);
   const [editPrefs, setEditPrefs] = useState(false);
@@ -1078,12 +1073,21 @@ function App() {
       if (!alive || window.LB_AUTH.recoveryActive) return;
       if (me) setAuthUid(me.id);
       if (me && !me.anonymous) {
+        if (window.LB_AUTH.socialError) { setAccountSheet(true); showToast(window.LB_AUTH.socialError); }
+        const social = me.providers?.some(provider => provider === 'google' || provider === 'kakao');
+        if (social && !me.prefs?.onboardingComplete && !(me.prefs?.gender && me.prefs?.styles?.length && me.prefs?.fit)) {
+          // 새 계정은 이 브라우저에 남은 다른 사용자의 설정을 가져오지 않는다.
+          prefsSynced.current = true;
+          setPrefs({ ...LB_DATA.DEFAULT_PREFS, ...(me.prefs || {}), email: me.email });
+          setOnboarded(false); setPhase('onboarding');
+          return;
+        }
         setPrefs((prev) => {
-          const np = { ...mergePrefs(prev, me.prefs), email: me.email };
+          const np = { ...mergePrefs(social ? LB_DATA.DEFAULT_PREFS : prev, me.prefs), email: me.email };
           // 계정 응답을 기다리는 동안 사용자가 만진 값은 그대로 둔다(껐다 켠 스위치가
           // 잠시 뒤 저절로 되돌아가면 고장 난 것처럼 보인다).
           const boot = prefsAtBoot.current || {};
-          Object.keys(prev).forEach((k) => {
+          if (!social) Object.keys(prev).forEach((k) => {
             if (JSON.stringify(prev[k]) !== JSON.stringify(boot[k])) np[k] = prev[k];
           });
           prefsSynced.current = true;
@@ -1095,6 +1099,7 @@ function App() {
         setOnboarded(true);
       } else if (!me) {
         setOnboarded(false);
+        if (new URLSearchParams(window.location.search).get('auth') === 'social') setPhase('login');
       }
     })();
     return () => { alive = false; };
@@ -1205,19 +1210,7 @@ function App() {
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUid, prefs.tryOnOther && prefs.tryOnOther.avatar]);
-  const completeOnboarding = (p) => { prefsSynced.current = true; setPrefs(p); persistPrefs(p); setOnboarded(true); };
-  // 가입 — 계정 단계를 넘어갈 때 실제 Supabase 계정을 만든다. 에러 문구를 돌려주면
-  // 온보딩이 그 단계에 머문다. 여기서 계정을 만들어야 다음 방문에 같은 옷장이 열린다.
-  const createAccount = async (email, pw) => {
-    if (!window.LB_AUTH) return '서버 설정이 없어요.';
-    const r = await window.LB_AUTH.signUp(email, pw);
-    if (r.error) return r.error;
-    const p = { ...prefs, email };
-    prefsSynced.current = true;   // 방금 만든 계정이라 이 기기 설정이 정본이다
-    setPrefs(p); persistPrefs(p);
-    if (r.user) setAuthUid(r.user.id);
-    return '';
-  };
+  const completeOnboarding = (p) => { prefsSynced.current = true; const np = { ...p, onboardingComplete: true }; setPrefs(np); persistPrefs(np); setOnboarded(true); };
   // 로그인 — 성공하면 그 계정의 옷장을 새로 읽어온다. 기기에 남아 있던 선호 정보는
   // 이어 쓰되 이메일은 세션 값으로 맞춘다.
   const completeLogin = async (email, pw) => {
@@ -3083,16 +3076,16 @@ function App() {
       return (
         <Onboarding
           mode="signup"
-          onAccount={createAccount}
+          initial={prefs}
           onDone={completeOnboarding}
           onCancel={() => setPhase('landing')}
         />
       );
     }
     if (phase === 'login') {
-      return <Login onDone={completeLogin} onCancel={() => setPhase('landing')} onSignup={() => setPhase('onboarding')} />;
+      return <Login onDone={completeLogin} onCancel={() => setPhase('landing')} />;
     }
-    return <Landing onStart={() => setPhase('onboarding')} onLogin={() => setPhase('login')} />;
+    return <Landing onStart={() => setPhase('login')} onLogin={() => setPhase('login')} />;
   }
 
   // ---- which screen ----

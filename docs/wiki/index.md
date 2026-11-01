@@ -98,3 +98,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - 공개 옷 상세 CTA: [design-system](design-system.md) — 상세 하단 공개 버튼은 카드와 같은 상태/저장 로직 공유.
 
 - [landing-copy](landing-copy.md) — 랜딩 제목 `실제 내 옷으로 코디하기`·단일 시작하기 버튼
+
+- [social-login](social-login.md) — 카카오·구글 OAuth와 기존 계정 연결·이메일 가입 종료·HSB 앱 재사용

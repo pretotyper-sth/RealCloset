@@ -300,7 +300,35 @@ function Landing({ onStart, onLogin }) {
 /* ----------------------------------------------------------------
    Login — 이미 계정이 있는 사용자. 가입 온보딩과 분리된 화면.
 ---------------------------------------------------------------- */
-function Login({ onDone, onCancel, onSignup }) {
+function SocialLoginButtons({ link = false }) {
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState(() => link ? '' : window.LB_AUTH?.socialError || '');
+  const [providers, setProviders] = useState([]);
+  useEffect(() => {
+    if (!link) return;
+    let alive = true;
+    window.LB_AUTH?.current().then(user => { if (alive) setProviders(user?.providers || []); }).catch(() => {});
+    return () => { alive = false; };
+  }, [link]);
+  const start = async provider => {
+    if (busy) return;
+    setBusy(provider); setError('');
+    try {
+      const result = await window.LB_AUTH?.signInSocial(provider, { link });
+      if (!result || result.error) setError(result?.error || '서버 설정이 없어요.');
+    } catch { setError('로그인하지 못했어요. 다시 시도해 주세요.'); }
+    finally { setBusy(''); }
+  };
+  return <div className="lb-auth-form" aria-busy={!!busy}>
+    {[['kakao', '카카오'], ['google', '구글']].map(([provider, label]) => <Btn key={provider} full size="lg" variant="secondary" disabled={!!busy || providers.includes(provider)} onClick={() => start(provider)}>
+      {providers.includes(provider) ? `${label} 연결됨` : busy === provider ? '연결 중…' : `${label}${link ? ' 연결하기' : '로 계속하기'}`}
+    </Btn>)}
+    {error && <p className="lb-form-error" role="alert">{error}</p>}
+  </div>;
+}
+
+function Login({ onDone, onCancel }) {
+  const [emailLogin, setEmailLogin] = useState(false);
   const [forgot, setForgot] = useState(false);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
@@ -333,23 +361,20 @@ function Login({ onDone, onCancel, onSignup }) {
   const formId = React.useId();
   return <AuthPage
     eyebrow={forgot ? '비밀번호 찾기' : '로그인'}
-    title={forgot ? (sent ? '메일함을 확인해 주세요' : '비밀번호를 잊으셨나요?') : '다시 만나서 반가워요'}
-    description={forgot ? (sent ? '가입된 이메일이라면 재설정 링크를 보내드려요. 스팸함도 확인해 주세요.' : '가입한 이메일로 비밀번호 재설정 링크를 보내드려요.') : '가입한 이메일로 로그인하면 내 옷장을 이어서 볼 수 있어요.'}
+    title={forgot ? (sent ? '메일함을 확인해 주세요' : '비밀번호를 잊으셨나요?') : emailLogin ? '이메일로 로그인' : '내 옷장을 시작해 보세요'}
+    description={forgot ? (sent ? '가입된 이메일이라면 재설정 링크를 보내드려요. 스팸함도 확인해 주세요.' : '가입한 이메일로 비밀번호 재설정 링크를 보내드려요.') : emailLogin ? '기존 이메일 계정으로 로그인해 주세요.' : '카카오나 구글 계정으로 가입하고 로그인해요.'}
     onClose={busy ? undefined : onCancel}
-    footer={<>
+    footer={emailLogin ? <>
       <Btn type="submit" form={formId} full size="lg" disabled={!valid || busy || (forgot && cooldown > 0)}>{busy ? (forgot ? '보내는 중…' : '로그인 중…') : forgot ? (cooldown ? `${cooldown}초 후 다시 보내기` : sent ? '재설정 메일 다시 보내기' : '재설정 메일 보내기') : '로그인'}</Btn>
-      {forgot ? <button type="button" className="lb-btn lb-auth-link lb-auth-back" disabled={busy} onClick={() => { setForgot(false); setErr(''); }}>로그인으로 돌아가기</button> : <div className="lb-auth-signup">
-        아직 계정이 없으신가요?
-        <button type="button" onClick={onSignup} className="lb-btn lb-auth-link">회원가입</button>
-      </div>}
-    </>}
+      <button type="button" className="lb-btn lb-auth-link lb-auth-back" disabled={busy} onClick={() => { if (forgot) setForgot(false); else setEmailLogin(false); setErr(''); }}>로그인 방법 선택</button>
+    </> : <button type="button" className="lb-btn lb-auth-link lb-auth-back" onClick={() => setEmailLogin(true)}>기존 이메일로 로그인</button>}
   >
-    <form id={formId} className="lb-auth-form" onSubmit={(e) => { e.preventDefault(); submit(); }} aria-busy={busy}>
+    {!emailLogin ? <SocialLoginButtons /> : <form id={formId} className="lb-auth-form" onSubmit={(e) => { e.preventDefault(); submit(); }} aria-busy={busy}>
       <LabeledField label="이메일" type="email" autoComplete="email" required disabled={busy} value={email} placeholder="you@example.com" onChange={value => { setEmail(value); setSent(false); setErr(''); }} />
       {!forgot && <LabeledField label="비밀번호" type="password" autoComplete="current-password" value={pw} placeholder="비밀번호 입력" required minLength={6} disabled={busy} onChange={value => { setPw(value); setErr(''); }} />}
       {!forgot && <button type="button" className="lb-btn lb-auth-link lb-auth-forgot" disabled={busy} onClick={() => { setForgot(true); setPw(''); setErr(''); }}>비밀번호를 잊으셨나요?</button>}
       {err && <p className="lb-form-error" role="alert">{err}</p>}
-    </form>
+    </form>}
   </AuthPage>;
 }
 
@@ -500,10 +525,9 @@ function PCCard({ pc, selected, diagnosed, onSelect }) {
 /* ----------------------------------------------------------------
    Onboarding — mode: 'signup' (계정 포함) | 'edit' (선호 정보만 수정)
 ---------------------------------------------------------------- */
-function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
+function Onboarding({ mode = 'signup', initial, onDone, onCancel }) {
   const isEdit = mode === 'edit';
   const [d, setD] = useState(() => ({ ...LB_DATA.DEFAULT_PREFS, ...(initial || {}) }));
-  const [pw, setPw] = useState('');
   const [pcModal, setPcModal] = useState(false);
   const [pcPhase, setPcPhase] = useState('intro');   // intro → upload → analyzing
   const [pcPhoto, setPcPhoto] = useState(null);      // 업로드한 얼굴 사진 (dataURL) — 얼굴 1명 통과분만
@@ -561,23 +585,6 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
     setPcModal(false);
   };
   const set = (k) => (v) => setD((s) => ({ ...s, [k]: v }));
-
-  // 단계 정의 — 가입은 계정부터, 수정은 선호 정보만.
-  const ACCOUNT = {
-    key: 'account', eyebrow: '계정 만들기', title: '이메일로 시작하기',
-    sub: 'REALCLOSET 계정을 만들어 옷장과 추천을 저장해요.',
-    valid: () => /\S+@\S+\.\S+/.test(d.email) && pw.length >= 6,
-    render: () => (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <LabeledField label="이메일" value={d.email} onChange={set('email')} placeholder="you@example.com" />
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--ink-2)', marginBottom: 6 }}>비밀번호</div>
-          <input className="lb-input" type="password" value={pw} placeholder="6자 이상" onChange={(e) => setPw(e.target.value)}
-            style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--r-md)', fontSize: 14, background: 'var(--ivory)', border: '1px solid var(--line)', color: 'var(--ink)', outline: 'none', boxSizing: 'border-box' }} />
-        </div>
-      </div>
-    ),
-  };
 
   const BASIC = {
     key: 'basic', eyebrow: '기본 정보', title: '나를 알려주세요',
@@ -661,7 +668,7 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
     ),
   };
 
-  const steps = isEdit ? [STYLES, FITPREF] : [ACCOUNT, BASIC, STYLES, FITPREF];
+  const steps = isEdit ? [STYLES, FITPREF] : [BASIC, STYLES, FITPREF];
   const [i, setI] = useState(0);
   // 단계가 바뀌면 본문을 맨 위로 올린다. 스크롤이 그대로 남아 있으면 새 단계의 첫 항목
   // (핏 선택 등)이 화면 밖에 있어서, 왜 '다음'이 안 눌리는지 알 수 없다.
@@ -670,22 +677,12 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
     const el = bodyRef.current;
     if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
   }, [i]);
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState('');
   const step = steps[i];
   const last = i === steps.length - 1;
   const canNext = step.valid();
 
-  // 계정은 이 단계를 넘어갈 때 바로 만든다. 마지막에 몰아서 만들면 '이미 가입된
-  // 이메일'을 네 단계 지나온 뒤에야 알게 되고, 입력한 걸 다 잃는다.
-  const next = async () => {
-    if (!canNext || busy) return;
-    if (!isEdit && step.key === 'account' && onAccount) {
-      setBusy(true); setErr('');
-      const msg = await onAccount(d.email.trim(), pw);
-      setBusy(false);
-      if (msg) { setErr(msg); return; }
-    }
+  const next = () => {
+    if (!canNext) return;
     if (last) onDone(d); else setI(i + 1);
   };
   const prev = () => (i === 0 ? (onCancel && onCancel()) : setI(i - 1));
@@ -724,9 +721,6 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
             <h1 style={{ margin: '10px 0 8px', fontSize: 24, fontWeight: 800, lineHeight: 1.2, letterSpacing: '-0.01em' }}>{step.title}</h1>
             <p style={{ margin: '0 0 24px', fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5 }}>{step.sub}</p>
             {step.render()}
-            {err && (
-              <div style={{ marginTop: 16, fontSize: 13, fontWeight: 600, color: '#B0573C', lineHeight: 1.45 }}>{err}</div>
-            )}
           </div>
         </div>
 
@@ -737,8 +731,8 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
               {i === 0 ? '취소' : '이전'}
             </Btn>
           )}
-          <Btn full size="lg" disabled={!canNext || busy} onClick={next} icon={last ? (isEdit ? 'check' : 'sparkle') : undefined}>
-            {busy ? '계정 만드는 중…' : (last ? (isEdit ? '저장' : '시작하기') : '다음')}
+          <Btn full size="lg" disabled={!canNext} onClick={next} icon={last ? (isEdit ? 'check' : 'sparkle') : undefined}>
+            {last ? (isEdit ? '저장' : '시작하기') : '다음'}
           </Btn>
         </div>
       </div>
@@ -883,4 +877,4 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel, onAccount }) {
 }
 
 // 프로필·AI 착장도 같은 얼굴 판정·문구를 쓰도록 공유한다.
-Object.assign(window, { Onboarding, Landing, Login, PasswordReset, countFacesInImage, faceCountError });
+Object.assign(window, { SocialLoginButtons, Onboarding, Landing, Login, PasswordReset, countFacesInImage, faceCountError });
