@@ -27,6 +27,9 @@ test('shared item details show recorded fields and context-appropriate actions',
     for (const text of ['아이템 정보', '브랜드', '99,000원', '블루', '사이즈', '소재', '매장', '내 기록', '상품 링크']) assert.ok(own.includes(text), text);
     assert.ok(!own.includes('만들기 재료로 담기'));
     assert.ok(!own.includes('아이템 목록</button>'));
+    const publish = renderToStaticMarkup(React.createElement(ProductSheet, { ...props, canSaveItem: () => false, detailAction: React.createElement('button', { 'aria-pressed': true }, '공개 중') }));
+    assert.ok(publish.includes('aria-pressed="true">공개 중</button>'));
+    assert.ok(!publish.includes('만들기 재료로 담기'));
     const other = renderToStaticMarkup(React.createElement(ProductSheet, props));
     assert.ok(other.includes('만들기 재료로 담기'));
     const saved = renderToStaticMarkup(React.createElement(ProductSheet, { ...props, collections: [{ type: 'item', item }] }));

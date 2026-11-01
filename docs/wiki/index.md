@@ -94,3 +94,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - 피드 아이템 누락 정보: [design-system](design-system.md) — 브랜드·가격 미등록 보조 문구로 고정 행의 공백 제거.
 
 - 세션 만료 오표시: [auth-recovery-keepalive](auth-recovery-keepalive.md) — 인증 통신 장애는 503, 명시적 인증 거절만 401. 운영 만료 값 확인 대기.
+
+- 공개 옷 상세 CTA: [design-system](design-system.md) — 상세 하단 공개 버튼은 카드와 같은 상태/저장 로직 공유.
