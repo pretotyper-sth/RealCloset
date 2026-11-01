@@ -96,3 +96,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - 세션 만료 오표시: [auth-recovery-keepalive](auth-recovery-keepalive.md) — 인증 통신 장애는 503, 명시적 인증 거절만 401. 운영 만료 값 확인 대기.
 
 - 공개 옷 상세 CTA: [design-system](design-system.md) — 상세 하단 공개 버튼은 카드와 같은 상태/저장 로직 공유.
+
+- [landing-copy](landing-copy.md) — 랜딩 제목 `실제 내 옷으로 코디하기`·단일 시작하기 버튼
