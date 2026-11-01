@@ -37,3 +37,7 @@
 ## 제공자 설정 확인 및 배포 준비
 
 2026-11-01: 공개 `/auth/v1/settings`로 REALCLOSET Google=true/Kakao=true를 확인했다. 사용자 직접 키 입력 완료. 브라우저 조회는 계속 시간 초과로 실패한다. 최신 원격 코드에 로그인 변경만 별도 적용해 기존 세션 장애 보호 등 다른 변경을 유지했다. OAuth 오류는 SDK의 URL 정리 전에 기억하고 기존 계정의 연결 실패도 계정 화면에서 안내한다. 실제 Google/Kakao 인증과 사용자 UUID/기록 유지 최종 검증은 사용자가 로그인해야 확인할 수 있다.
+
+## Deployment verification - 2026-11-01
+
+Commit 9295de2 deployed successfully on Vercel. Live bundles contain social login choices. Render legacy signup endpoint returns 403. Public Auth settings enable Google and Kakao. OAuth start requests use the REALCLOSET callback; Google returns 200, Kakao returns 200 with a browser User-Agent (default server request returned 404). User confirmed saving the Before User Created hook to public.hook_restrict_email_signup. Browser timeouts prevented independent hook verification. Node 13 tests and Python 1 test passed; production build passed. No real user data or passwords were changed. Final owner check remains: sign in using the existing email account, link Google in account settings, then verify the same wardrobe and records through Google login.
