@@ -51,7 +51,7 @@
   .rc-story-mobile:has(.rc-text-tools) .rc-lab-canvas-wrap>.rc-canvas{width:min(100%,max(160px,calc((100dvh - 304px)*.8)))}
   .rc-story-mobile .rc-material-close{top:12px;right:12px;width:36px;height:36px;padding:0;line-height:1}
   .rc-story-mobile .rc-material-close>svg{display:block}
-  .rc-story-mobile .rc-lab-title{min-height:36px;padding-right:44px;box-sizing:border-box;justify-content:center}
+  .rc-story-mobile .rc-lab-title{min-height:36px;padding-right:44px;box-sizing:border-box;justify-content:flex-start}
   .rc-story-mobile .rc-lab-title h3{margin:0}
 }
 @media(max-width:650px){
@@ -105,16 +105,16 @@
 .lb-sheet:has(>.rc-publish.rc-story-desktop){background:var(--ivory)!important}
 
 .rc-giphy-picker .rc-lab-title{display:flex;flex-direction:row;align-items:center;justify-content:space-between}.rc-giphy-picker .rc-lab-title>span{margin-left:auto;text-align:right}
-@media(max-width:650px){.rc-story-mobile.rc-step-1:has(.rc-text-tools){--rc-option-height:min(var(--rc-requested-panel-height,150px),32dvh)}.rc-story-mobile .rc-text-colors{justify-content:flex-start;padding-left:6px;gap:12px}.rc-story-mobile .rc-text-tools .rc-panel-resize{margin-bottom:8px}}
+@media(max-width:650px){.rc-story-mobile.rc-step-1:has(.rc-text-tools){--rc-option-height:min(var(--rc-requested-panel-height,190px),32dvh)}.rc-story-mobile .rc-text-colors{justify-content:flex-start;padding-left:6px;gap:12px}.rc-story-mobile .rc-text-tools .rc-panel-resize{margin-bottom:8px}}
 
-@media(max-width:650px){.rc-story-mobile.rc-step-1 .rc-text-tools .rc-panel-resize{margin-left:auto;margin-right:auto}.rc-story-mobile .rc-lab-title{align-items:center}.rc-story-mobile .rc-lab-title>span{white-space:nowrap;flex:none}}
+@media(max-width:650px){.rc-story-mobile.rc-step-1 .rc-text-tools .rc-panel-resize{margin-left:auto;margin-right:auto}.rc-story-mobile .rc-lab-title{align-items:flex-start;text-align:left}.rc-story-mobile .rc-lab-title>span{white-space:nowrap;flex:none}}
 
 /* Shared DS controls; selection frames remain available on the canvas. */
 .rc-story { --range-accent: #BF603D; }
 .rc-lab-selection .lb-range { width: 100%; }
 .rc-layer-order-controls { display: inline-flex; align-items: center; gap: var(--s1); }
 .rc-lab-selection .rc-lab-layer-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s2); }
-.rc-lab-layer-actions .rc-layer-order-controls .lb-btn { min-height: 36px; border: 0; border-radius: var(--r-pill); font-size: var(--fs-xs); color: var(--ink); }
+.rc-lab-layer-actions button { min-height: 36px; padding: 6px 8px; border: 0; border-radius: 0; background: none; box-shadow: none; font-size: 11px; font-weight: 400; color: var(--ink-2); }
 .rc-text-tools-row .rc-layer-order-controls { margin-left: auto; }
 @media (max-width: 650px) {
   .rc-story-mobile .rc-lab-selection .rc-lab-layer-actions { flex-wrap: nowrap; gap: 2px; }

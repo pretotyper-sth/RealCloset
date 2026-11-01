@@ -109,3 +109,10 @@ body:has([aria-hidden="false"] > .rc-feed) .lb-dev-seed-toggle{display:none}
 
 .rc-feed-error{box-sizing:border-box;width:100%;padding:16px;border:1px solid var(--line);border-radius:var(--r-lg);margin-bottom:20px}.rc-feed-error .rc-error{margin:0 0 12px}.rc-feed-error>button{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--r-pill)}
 @media(max-width:759px){.rc-feed .rc-feed-main{min-width:0;width:100%;box-sizing:border-box}.rc-feed-error{width:auto;margin:0 16px 20px}}
+
+@media(max-width:650px){
+ .rc-feed-library .rc-section-title{margin:16px var(--s4)}
+ .rc-feed.rc-feed-library .rc-look-grid{margin-inline:var(--s4);padding-inline:0}
+ .rc-feed-library .rc-personal-shortcuts{margin-right:-12px}
+ .rc-feed-library .rc-saved-shortcut{width:44px;display:grid;place-items:center;padding:0}
+}

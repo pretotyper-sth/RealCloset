@@ -166,7 +166,7 @@ def owner(request: Request, x_studio_owner: str = Header(default='')):
 
 
 class LookBody(BaseModel):
-    title: str = Field(default='나의 스타일', max_length=80)
+    title: str = Field(default='나의 피드', max_length=80)
     note: str = Field(default='', max_length=600)
     hashtags: list[str] = Field(default_factory=list, max_length=10)
     author: str = Field(default='나', max_length=40)
@@ -318,16 +318,16 @@ def list_looks(request: Request, x_studio_owner: str = Header(default='')):
 @router.put('/looks/{look_id}')
 def save_look(look_id: str, body: LookBody, request: Request, x_studio_owner: str = Header(default='')):
     uid = owner(request, x_studio_owner)
-    if not look_id or len(look_id) > 100: raise HTTPException(400, '스타일 주소가 올바르지 않아요.')
+    if not look_id or len(look_id) > 100: raise HTTPException(400, '피드 주소가 올바르지 않아요.')
     data = payload(body)
     with _LOCK, db() as conn:
         row = conn.execute('SELECT * FROM looks WHERE id=?', (look_id,)).fetchone()
-        if row and row['owner'] != uid: raise HTTPException(403, '내 스타일만 수정할 수 있어요.')
+        if row and row['owner'] != uid: raise HTTPException(403, '내 피드만 수정할 수 있어요.')
         share = (row['share'] if row else None) if data['privacy'] != 'private' else None
         if data['privacy'] != 'private' and not share: share = secrets.token_urlsafe(24)
         conn.execute('INSERT INTO looks VALUES(?,?,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload,share=excluded.share WHERE looks.owner=excluded.owner', (look_id, uid, json.dumps(data, ensure_ascii=False), share))
         saved = conn.execute('SELECT owner FROM looks WHERE id=?', (look_id,)).fetchone()
-        if not saved or saved['owner'] != uid: raise HTTPException(403, '내 스타일만 수정할 수 있어요.')
+        if not saved or saved['owner'] != uid: raise HTTPException(403, '내 피드만 수정할 수 있어요.')
         index_look(conn, look_id, uid, data)
         if data['privacy'] == 'public' and data.get('origin') and not data['origin'].get('sample'):
             original = conn.execute('SELECT * FROM looks WHERE share=? OR id=?', (data['origin']['id'], data['origin']['id'])).fetchone()
@@ -466,7 +466,7 @@ def feed(request: Request, x_studio_owner: str = Header(default='')):
 
 def shared_row(share, conn):
     row = conn.execute('SELECT * FROM looks WHERE share=?', (share,)).fetchone()
-    if not row: raise HTTPException(404, '공유가 종료됐거나 존재하지 않는 스타일이에요.')
+    if not row: raise HTTPException(404, '공유가 종료됐거나 존재하지 않는 피드예요.')
     return row
 
 
@@ -502,7 +502,7 @@ def react(share: str, body: dict, request: Request, x_studio_owner: str = Header
 def reply(share: str, body: dict, request: Request, x_studio_owner: str = Header(default='')):
     visitor = owner(request, x_studio_owner)
     text = str(body.get('text', '')).strip()[:600]
-    if not text: raise HTTPException(400, '스타일링 제안을 적어 주세요.')
+    if not text: raise HTTPException(400, '코디 제안을 적어 주세요.')
     with db() as conn:
         shared_row(share, conn)
         conn.execute('INSERT INTO replies VALUES(?,?,?,?,?)', (secrets.token_urlsafe(12), share, visitor, str(body.get('name', '친구'))[:40], text))
@@ -535,16 +535,16 @@ def poll_result(token, visitor, conn, now=None):
 @router.post('/polls')
 def create_poll(body: PollBody, request: Request, x_studio_owner: str = Header(default='')):
     uid = owner(request, x_studio_owner)
-    if len(set(body.lookIds)) != len(body.lookIds): raise HTTPException(400, '서로 다른 스타일을 골라 주세요.')
+    if len(set(body.lookIds)) != len(body.lookIds): raise HTTPException(400, '서로 다른 피드를 골라 주세요.')
     with _LOCK, db() as conn:
         looks = []
         for look_id in body.lookIds:
             row = conn.execute('SELECT * FROM looks WHERE id=? AND owner=?', (look_id, uid)).fetchone()
-            if not row: raise HTTPException(404, '내가 저장한 스타일만 투표에 넣을 수 있어요.')
+            if not row: raise HTTPException(404, '내가 저장한 피드만 투표에 넣을 수 있어요.')
             look = public_look(row, conn)
             looks.append({k: look[k] for k in ('title', 'author', 'background', 'items', 'decorations', 'photo', 'includePhoto')})
         data = {'question': body.question, 'looks': looks}
-        if len(json.dumps(data)) > 16000000: raise HTTPException(413, '이미지가 많아요. 스타일 수를 줄여 주세요.')
+        if len(json.dumps(data)) > 16000000: raise HTTPException(413, '이미지가 많아요. 피드 수를 줄여 주세요.')
         token = secrets.token_urlsafe(24)
         conn.execute('INSERT INTO polls(token,owner,payload,created_at) VALUES(?,?,?,?)', (token, uid, json.dumps(data, ensure_ascii=False), datetime.now(timezone.utc).isoformat()))
         return poll_result(token, uid, conn)
@@ -661,7 +661,7 @@ def sample_reactions(request: Request, x_studio_owner: str = Header(default=''))
 @router.post('/samples/{identifier}/reaction')
 def sample_like(identifier: str, body: dict, request: Request, x_studio_owner: str = Header(default='')):
     uid = owner(request, x_studio_owner)
-    if not re.fullmatch(r'editorial-v4-[0-7]', identifier): raise HTTPException(404, '예시 스타일을 찾지 못했어요.')
+    if not re.fullmatch(r'editorial-v4-[0-7]', identifier): raise HTTPException(404, '예시 피드를 찾지 못했어요.')
     share = 'sample:' + identifier[-1]
     with _LOCK, db() as conn:
         conn.execute('DELETE FROM reactions WHERE share=? AND visitor=? AND kind=?', (share, uid, 'like'))

@@ -88,3 +88,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [design-system](design-system.md) — 제품명은 REALCLOSET 대문자 표기, 도메인·내부 ID는 유지
 
 - [profile-face-pose-2026-10](profile-face-pose-2026-10.md) — 프로필 얼굴 특징·촬영 각도 분리, 자연스러운 전신 포즈 참조, 바로보기 마스크 보호 및 롤백 기준
+
+- [feed-ux-2026-11](feed-ux-2026-11.md) — 자유 스크롤/촘촘한 아이템·꾸미기 왼쪽 제목/텍스트 제목·순서 텍스트 버튼·내 피드 16px 정렬·피드 용어 변경 전체 목록
