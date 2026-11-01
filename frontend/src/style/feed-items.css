@@ -98,3 +98,9 @@
     scrollbar-width: none;
   }
 }
+
+.rc-feed-item-copy .rc-feed-item-missing {
+  color: var(--ink-3);
+  font-weight: 400;
+  font-size: 10px;
+}
