@@ -2398,7 +2398,7 @@ function AddSheet({ ctx }) {
     header = anchor ? '고민 중인 옷 추가' : '옷장에 아이템 추가';
     sub = anchor
       ? '이 옷이 내 옷장 옷들과 어울리는지 확인해볼게요.'
-      : '사진 한 장 속 여러 개를 자동으로 분리해 드려요.';
+      : tab === 'orders' ? '쇼핑몰 구매내역에서 옷을 골라 담아요.' : '사진 한 장 속 여러 개를 자동으로 분리해 드려요.';
   }
 
   const showBack = stage === 'select' || stage === 'register' || stage === 'anchor-ready' || stage === 'reextract-confirm';
@@ -3351,7 +3351,7 @@ function AddSheet({ ctx }) {
                 {tab === 'orders' ? (
                   mobileOrderTab
                     ? null
-                    : <><Icon name="bag" size={15} /> 주문내역에서 옷을 골라 담아요</>
+                    : <><Icon name="lock" size={15} /> 로그인 정보는 확장에 저장하지 않아요</>
                 ) : (
                   tab === 'url'
                     ? <>한 번에 최대 {URL_ROW_MAX}개까지 추가할 수 있어요</>

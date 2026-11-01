@@ -14,3 +14,9 @@ Chrome 웹스토어 공개 전용 자료는 `extensions/lookbox-orders/STORE_LIS
 - `tools/package-order-extension.py`가 실행 파일8개만 ZIP으로 만든다. 생성물: `/Users/js.kim/Documents/ChatGPT/RC/releases/realcloset-orders-0.3.46.zip`. 등록 문구는 `STORE_LISTING.md`; 구매 가격·구매일 처리를 데이터 고지에 반영했다.
 - **미완료:** Chrome 연결 도구가 「Local browser use is disabled in Work settings」를 반환해 업로드·실제 스토어 ID 발급·심사 제출을 하지 못했다. `VITE_ORDER_EXTENSION_STORE_URL`도 실제 주소 확인 후 연결해야 한다. 기존 스토어 스크린샷은 이전 개발 화면이라 현재 화면으로 교체해야 한다.
 - 사용자 개발자 등록/Chrome 로그인 완료 진술은 확인했다. 등록비·계정 생성은 다시 진행하지 않는다. 게시 완료로 보고하지 않는다.
+
+### Chrome 연결 복구
+
+2026-11-01 `@브라우저` 선택 후 Chrome 프로필2개가 실제로 연결됐다. 개발자 계정 pretotyper의 대시보드(항목0/2)를 사용자가 열어 로그인·등록 완료를 확인했다. Chrome은 웹스토어 스크립팅을 차단(`The extensions gallery cannot be scripted`)하므로 스토어 작업은 native Chrome UI가 필요하다. 같은 Chrome을 다른 대화가 전환 중이라 업로드 전 해당 브라우저 작업의 일시 중지를 요청했다. 별도 전화번호 인증 창 선택은 자동 승인 검토에서 범위 밖으로 거절됐고, 그 창은 접근하지 않았다. 이후 사용자가 직접 연 웹스토어 대시보드는 읽기 확인했다.
+
+라이브의 명시적 `orderDemo=1&orderPreview=1&add=orders` 예시 모드에서 쇼핑몰 선택→가상 로그인→주문내역→6개 상품 선택까지 확인했다. 실제 쇼핑몰 수집/옷장 저장 성공으로 간주하지 않는다. 구매내역 탭의 사진 전용 부제를 올바른 안내로 바꾸고 하단 중복 안내는 로그인 정보 미저장 설명으로 교체한다. 모바일 하단 공간은 기존 빈 상태를 유지한다.
