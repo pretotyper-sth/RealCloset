@@ -106,3 +106,27 @@
 .rc-following-toggle[aria-pressed=true]{background:#fff;color:#1b1b1b;border-color:var(--line)}
 
 .rc-closet-visibility{flex-direction:column;align-items:flex-start;gap:9px;margin:0}.rc-closet-visibility-copy label{font-size:12px;font-weight:600;color:var(--ink-2)}.rc-closet-visibility>div:last-child{background:none;padding:0;gap:6px}.rc-closet-visibility button{border:1px solid var(--line);border-radius:var(--r-pill);font-size:12.5px;padding:7px 13px}.rc-closet-visibility button[aria-pressed=true]{border-color:var(--ink)}
+
+.rc-creator-clothes article{min-width:0;display:flex;flex-direction:column}
+.rc-creator-clothes h4{line-height:1.5;height:3em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.rc-creator-clothes article>span{line-height:1.5;min-height:1.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-creator-clothes article>button[aria-pressed=true]:disabled{background:var(--ink);color:var(--ivory);border-color:var(--ink)}
+
+.rc-experience.rc-feed,.rc-feed .rc-page-head{background:var(--ivory)}
+.rc-feed .rc-page-head h1{font-size:25px;font-weight:800;line-height:1.2;letter-spacing:normal}
+@media(min-width:760px){
+ .rc-experience.rc-feed{padding-top:28px;padding-left:32px;padding-right:32px}
+ .rc-feed .rc-feed-layout>.rc-page-head{min-height:30px;margin-bottom:var(--gap-header);align-items:center}
+ .rc-feed .rc-feed-heading,.rc-feed .rc-feed-head-actions{height:30px}
+ .rc-feed-head-actions{margin-top:0}
+}
+@media(min-width:1600px){.rc-experience.rc-feed{padding-left:40px;padding-right:40px}}
+@media(min-width:2200px){.rc-experience.rc-feed{padding-left:56px;padding-right:56px}}
+@media(max-width:759px){
+ .rc-experience.rc-feed{padding-top:calc(env(safe-area-inset-top,0px) + 22px);padding-left:0;padding-right:0}
+ .rc-feed .rc-page-head{position:relative;top:auto;min-height:24px;padding:0 18px;margin:0 0 var(--gap-header);align-items:center}
+ .rc-feed .rc-page-head h1{font-size:20px}
+ .rc-feed .rc-gallery-nav{margin-left:18px;margin-right:18px}
+ .rc-feed .rc-feed-heading,.rc-feed .rc-feed-head-actions{height:24px}
+ .rc-feed-head-actions{margin-top:0}
+}

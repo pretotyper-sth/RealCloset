@@ -3034,7 +3034,7 @@ function App() {
     const next={...item,...data.item,public:published};
     setItems(list=>list.map(x=>x.id===item.id?next:x));
     liveRememberItem(next);
-    if(window.RC_SYNC_CLOSET_ITEMS)await window.RC_SYNC_CLOSET_ITEMS([next],prefs);
+    return next;
   };
   const refreshStudioLookbook = async () => {
     const data=await liveJSON('/api/live/outfits?saved=1');

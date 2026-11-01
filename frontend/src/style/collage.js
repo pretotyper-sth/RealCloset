@@ -1,4 +1,5 @@
 export const INKS = ['#292824','#ffffff','#d7fa3a','#ff713e','#ff8fbe','#7cbaff','#8866e7','#27886c'];
+export const TEXT_INKS = [...INKS, '#8d8b82', '#e3455e', '#ffd85c', '#c9b7ef', '#4cb6ac', '#23416a', '#aa7855', '#e7dcc7'];
 export const FONTS = { sans:'Pretendard, sans-serif', bold:'Arial Black, Pretendard, sans-serif', serif:'Georgia, serif', mono:'Courier New, monospace', hand:'cursive' };
 export const EMOJI_PACKS = {
   '표정':['🙂','🙃','😎','🤩','🥹','😭','😤','🫠','🫶','🤍','🖤','💚','💘','💅','👀','🫡','🤭','😮‍💨','🤠','😈','👽','👻','💀','🤖'],

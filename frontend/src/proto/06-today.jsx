@@ -32,8 +32,7 @@ function ContextStrip({ selected, today, calOpen, setCalOpen, view, setView, onS
     const place = () => {
       const r = btnRef.current.getBoundingClientRect();
       const width = Math.min(300, window.innerWidth - 24);
-      let left = r.left;
-      if (left + width > window.innerWidth - 12) left = Math.max(12, window.innerWidth - width - 12);
+      const left = Math.max(12, Math.min(r.left, window.innerWidth - width - 12));
       setCalPos({ top: r.bottom + 8, left, width });
     };
     place();
@@ -50,6 +49,7 @@ function ContextStrip({ selected, today, calOpen, setCalOpen, view, setView, onS
       display: 'flex', alignItems: 'center', gap: 10, marginTop: 'var(--s4)',
       minWidth: 0,
     }}>
+      <div className="lb-context-strip" style={{ display: 'flex', gap: 8, flex: 1, minWidth: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', padding: 2 }}>
       <div style={{ flex: 'none' }}>
         <button ref={btnRef} type="button" onClick={() => setCalOpen((o) => !o)} aria-label="날짜 선택" aria-expanded={calOpen}
           style={{ ...pill, cursor: 'pointer', color: isToday ? 'var(--ink-2)' : 'var(--accent-ink)', background: isToday ? 'var(--surface)' : 'var(--accent)', boxShadow: isToday ? 'inset 0 0 0 1px var(--line)' : 'none', whiteSpace: 'nowrap' }}>
@@ -57,11 +57,6 @@ function ContextStrip({ selected, today, calOpen, setCalOpen, view, setView, onS
           <Icon name="chevD" size={13} stroke={2} style={{ transform: calOpen ? 'rotate(180deg)' : 'none', transition: 'transform var(--dur) var(--ease)' }} />
         </button>
       </div>
-      <div style={{
-        display: 'flex', flexWrap: 'nowrap', gap: 8, flex: 1, minWidth: 0,
-        overflowX: 'auto', WebkitOverflowScrolling: 'touch',
-        marginLeft: -2, paddingLeft: 2, paddingRight: 2,
-      }}>
         <button type="button" onClick={() => LB_DATA.refreshWeather && LB_DATA.refreshWeather()} disabled={w.status === 'loading'} aria-label={w.status === 'error' ? '날씨 다시 불러오기' : '날씨 새로고침'} style={{ ...pill, border: 0, flex: 'none', whiteSpace: 'nowrap', cursor: w.status === 'loading' ? 'default' : 'pointer' }}>
           <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)' }} />
           {w.status === 'error' ? '날씨를 불러오지 못했어요 · 재시도' : w.temp == null ? '날씨 불러오는 중' : `${w.city} ${w.temp}° ${w.cond}`}
