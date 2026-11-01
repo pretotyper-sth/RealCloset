@@ -7,3 +7,6 @@
 - 개발 환경 보조 버튼 `옷장부터 시작하기`를 제거했다. 기존 로그인 진입은 유지한다.
 
 근거: `frontend/src/proto/07-onboarding.jsx`의 `Landing`. 이번 변경은 로그인 연동 구현과 분리한다.
+
+
+2026-11-01 update: landing now directly offers Kakao and Google login buttons with provider logos. Removed the intermediate start button and separate login link; the approved title is preserved.

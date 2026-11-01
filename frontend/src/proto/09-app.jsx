@@ -3,7 +3,7 @@ import { loadCurrentWeather, validWeather } from '../weather.js';
 const React = window.React;
 const ReactDOM = window.ReactDOM;
 const { BottomSheet, useEscapeClose } = window;
-const { AccountEditSheet, AddSheet, BottomNav, Btn, CheckField, ClosetJobStatus, DecisionScreen, DetailScreen, PickedOutfitsModal, Eyebrow, Icon, ImageViewer, ItemDetailSheet, ItemRemoveSheet, LB_DATA, Landing, Login, PasswordReset, FeedScreen, LookbookScreen, MyPageScreen, Onboarding, ResultsScreen, SAVED, TodayScreen, TryOnCameraOverlay, TryOnDesktopSheet, TryOnSetupOverlay, TweakColor, TweakRadio, TweakSection, TweaksPanel, WARDROBE, WardrobeScreen, Wordmark, useTweaks } = window;
+const { AccountEditSheet, AddSheet, BottomNav, Btn, CheckField, ClosetJobStatus, DecisionScreen, DetailScreen, PickedOutfitsModal, Eyebrow, Icon, ImageViewer, ItemDetailSheet, ItemRemoveSheet, LB_DATA, Landing, Login, FeedScreen, LookbookScreen, MyPageScreen, Onboarding, ResultsScreen, SAVED, TodayScreen, TryOnCameraOverlay, TryOnDesktopSheet, TryOnSetupOverlay, TweakColor, TweakRadio, TweakSection, TweaksPanel, WARDROBE, WardrobeScreen, Wordmark, useTweaks } = window;
 
 /* global React, ReactDOM, LB_DATA, useTweaks, TweaksPanel, TweakSection, TweakColor, TweakRadio, TweakToggle,
    Wordmark, BottomNav, WardrobeScreen, AddSheet, ResultsScreen, LookbookScreen, DetailScreen, Btn, Icon, ItemDetailSheet */
@@ -1039,23 +1039,6 @@ function App() {
   const [accountSheet, setAccountSheet] = useState(false);
   const [personalSetupOpen, setPersonalSetupOpen] = useState(false);
   const [, setWeatherRev] = useState(0);
-  const [recovery, setRecovery] = useState(() => window.LB_AUTH?.recoveryActive ? 'loading' : '');
-  useEffect(() => {
-    let alive = true;
-    const check = async () => {
-      if (!window.LB_AUTH?.recoveryActive) return;
-      setRecovery('loading');
-      const status = await window.LB_AUTH.recoveryStatus();
-      if (alive) setRecovery(status);
-    };
-    check();
-    window.addEventListener('lb-password-recovery', check);
-    return () => { alive = false; window.removeEventListener('lb-password-recovery', check); };
-  }, []);
-  const finishRecovery = () => {
-    window.LB_AUTH.finishRecovery();
-    setRecovery(''); setOnboarded(false); setAuthUid(null); setPhase('login');
-  };
   const [phase, setPhase] = useState('landing');   // landing → onboarding | login → (app)
   const weatherRequestRef = useRef(null);
 
@@ -1070,7 +1053,7 @@ function App() {
     (async () => {
       if (!window.LB_AUTH) return;
       const me = await window.LB_AUTH.current();
-      if (!alive || window.LB_AUTH.recoveryActive) return;
+      if (!alive) return;
       if (me) setAuthUid(me.id);
       if (me && !me.anonymous) {
         if (window.LB_AUTH.socialError) { setAccountSheet(true); showToast(window.LB_AUTH.socialError); }
@@ -1211,29 +1194,9 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authUid, prefs.tryOnOther && prefs.tryOnOther.avatar]);
   const completeOnboarding = (p) => { prefsSynced.current = true; const np = { ...p, onboardingComplete: true }; setPrefs(np); persistPrefs(np); setOnboarded(true); };
-  // 로그인 — 성공하면 그 계정의 옷장을 새로 읽어온다. 기기에 남아 있던 선호 정보는
-  // 이어 쓰되 이메일은 세션 값으로 맞춘다.
-  const completeLogin = async (email, pw) => {
-    if (!window.LB_AUTH) return '서버 설정이 없어요.';
-    const r = await window.LB_AUTH.signIn(email, pw);
-    if (r.error) return r.error;
-    // 계정에 저장된 설정이 있으면 그걸 쓴다 (다른 기기에서 처음 로그인하는 경우)
-    const p = { ...mergePrefs(prefs, r.user.prefs), email: r.user.email || email };
-    prefsSynced.current = true;
-    setPrefs(p); persistPrefs(p); setOnboarded(true);
-    setAuthUid(r.user.id);
-    return '';
-  };
   const saveEditedPrefs = (p) => { setPrefs(p); persistPrefs(p); setEditPrefs(false); showToast('선호 정보를 저장했어요', 'check'); };
   const openPrefs = () => setEditPrefs(true);
   const openAccount = () => setAccountSheet(true);
-  const changePassword = async (password) => {
-    if (!window.LB_AUTH || !window.LB_AUTH.updatePassword) return '서버 설정이 없어요.';
-    const result = await window.LB_AUTH.updatePassword(password);
-    if (result.error) return result.error;
-    showToast('비밀번호를 변경했어요', 'check');
-    return '';
-  };
   const emptyTryOnAssets = () => ({ body: '', top: '', bottom: '', full: '' });
   const emptyTryOnOther = () => ({
     avatar: '', gender: '', age: '', height: '', weight: '',
@@ -3068,7 +3031,6 @@ function App() {
     startComboOrWardrobe: () => comboReady ? startCombo() : (go('wardrobe'), openAdd('wardrobe')),
   };
 
-  if (recovery) return <PasswordReset status={recovery} onFinish={finishRecovery} />;
 
   // ---- 온보딩 게이트: 가입 전이면 홈(랜딩) → 회원가입 단계 ----
   if (!onboarded) {
@@ -3083,9 +3045,9 @@ function App() {
       );
     }
     if (phase === 'login') {
-      return <Login onDone={completeLogin} onCancel={() => setPhase('landing')} />;
+      return <Login onCancel={() => setPhase('landing')} />;
     }
-    return <Landing onStart={() => setPhase('login')} onLogin={() => setPhase('login')} />;
+    return <Landing />;
   }
 
   // ---- which screen ----
@@ -3215,7 +3177,7 @@ function App() {
           if (t && t.img) openImageViewer(t);
         }}
       />
-      <AccountEditSheet open={accountSheet} prefs={prefs} onClose={() => setAccountSheet(false)} onSave={saveAccount} onChangePassword={changePassword} />
+      <AccountEditSheet open={accountSheet} prefs={prefs} onClose={() => setAccountSheet(false)} onSave={saveAccount} />
 
       <TryOnSetupOverlay
         open={tryOnSetup}

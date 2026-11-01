@@ -1442,3 +1442,6 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-01: Google/Kakao 활성화 확인 후 로그인 코드 배포 준비. 기존 UUID 유지/신규 소셜 온보딩/이메일 로그인·복구 유지/가입 API 종료. HSB 앱 재사용, 향후 Kakao 앱 분리 시 재연결 필요. [[social-login]]
 
 - 2026-11-01: Social login 9295de2 deployed; live UI/provider settings and backend signup 403 verified. User confirmed Auth hook saved. Final owner login and linked-account data verification remain. [[social-login]]
+
+
+2026-11-01: After owner-confirmed Google linking, removed email/password UI/APIs and placed provider-logo OAuth actions directly on landing. Preserved account data. [[social-login]], [[landing-copy]], [[design-system]].

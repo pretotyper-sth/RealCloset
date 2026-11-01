@@ -100,3 +100,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [landing-copy](landing-copy.md) — 랜딩 제목 `실제 내 옷으로 코디하기`·단일 시작하기 버튼
 
 - [social-login](social-login.md) — 카카오·구글 OAuth와 기존 계정 연결·이메일 가입 종료·HSB 앱 재사용
+
+- Social-only entry and email login removal: [social-login](social-login.md), [design-system](design-system.md).

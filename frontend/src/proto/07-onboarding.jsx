@@ -1,6 +1,6 @@
 /* @prototype-ported */
 const React = window.React;
-const { AuthPage, Btn, Chip, Eyebrow, Icon, LB_DATA, LabeledField, NumberSlider, PALETTE, PERSONAL_COLORS, SmartImg, useEscapeClose, WARDROBE, Wordmark } = window;
+const { AuthPage, Btn, Chip, Eyebrow, Icon, LB_DATA, NumberSlider, PALETTE, PERSONAL_COLORS, SmartImg, useEscapeClose, WARDROBE, Wordmark } = window;
 
 /* global React, Btn, Chip, Icon, Wordmark, Eyebrow, LabeledField, Thumb, LB_DATA */
 // REALCLOSET — 회원가입 / 선호 정보 온보딩. 단계별(step) 흐름.
@@ -126,7 +126,7 @@ function HeroTile({ img, name, anchor }) {
 // 모바일에서도 절대 줄바꿈되지 않도록 짧게 유지한다 (폰트도 뷰포트에 맞춰 줄어듦).
 const HERO_STEPS = ['옷 올리기', '내 옷장 매칭', '코디 보고 결정'];
 
-function Landing({ onStart, onLogin }) {
+function Landing() {
   // 화면 순서는 '질문 → 동작 → 답 → 행동'. 카드는 판정("잘 어울려요")이 아니라
   // 결과물(입을 수 있는 조합)만 보여준다 — 그게 제품의 약속이라서.
   const anchor = { ...HERO_ANCHOR, img: LB_DATA.IMG[HERO_ANCHOR.key] };
@@ -277,19 +277,8 @@ function Landing({ onStart, onLogin }) {
           <div style={{ flex: '3 1 8px', minHeight: 4 }} />
         </div>
 
-        {/* CTA와 로그인은 탭 영역이 겹치지 않게 확실히 띄운다. */}
         <div style={{ flex: 'none', paddingTop: 6, paddingBottom: 'max(env(safe-area-inset-bottom), 16px)' }}>
-          <Btn full size="lg" onClick={onStart}>시작하기</Btn>
-          <div style={{
-            marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 2, fontSize: 13, color: 'var(--ink-2)', ...KEEP,
-          }}>
-            이미 계정이 있으신가요?
-            <button onClick={onLogin} className="lb-btn" style={{
-              background: 'transparent', color: 'var(--ink)', fontSize: 13, fontWeight: 700,
-              padding: '11px 12px', textDecoration: 'underline', textUnderlineOffset: 3,
-            }}>로그인</button>
-          </div>
+          <SocialLoginButtons />
         </div>
       </div>
     </div>
@@ -319,97 +308,18 @@ function SocialLoginButtons({ link = false }) {
     } catch { setError('로그인하지 못했어요. 다시 시도해 주세요.'); }
     finally { setBusy(''); }
   };
-  return <div className="lb-auth-form" aria-busy={!!busy}>
-    {[['kakao', '카카오'], ['google', '구글']].map(([provider, label]) => <Btn key={provider} full size="lg" variant="secondary" disabled={!!busy || providers.includes(provider)} onClick={() => start(provider)}>
-      {providers.includes(provider) ? `${label} 연결됨` : busy === provider ? '연결 중…' : `${label}${link ? ' 연결하기' : '로 계속하기'}`}
+  return <div className="lb-social-login" aria-busy={!!busy}>
+    {[['kakao', '카카오'], ['google', '구글']].map(([provider, label]) => <Btn key={provider} full size="lg" variant="secondary" disabled={!!busy || providers.includes(provider)} onClick={() => start(provider)} style={{ position: 'relative', height: 52, padding: '0 48px', borderRadius: 12, background: provider === 'kakao' ? '#FEE500' : '#fff', color: provider === 'kakao' ? 'rgba(0,0,0,.85)' : '#1F1F1F', boxShadow: provider === 'kakao' ? 'none' : 'inset 0 0 0 1px #747775' }}>
+      <img src={`/auth/${provider}.svg`} alt="" width="20" height="20" style={{ position: 'absolute', left: 18 }} />
+      {providers.includes(provider) ? `${label} 연결됨` : busy === provider ? '연결 중…' : `${label}${link ? ' 연결하기' : '로 로그인'}`}
     </Btn>)}
     {error && <p className="lb-form-error" role="alert">{error}</p>}
   </div>;
 }
 
-function Login({ onDone, onCancel }) {
-  const [emailLogin, setEmailLogin] = useState(false);
-  const [forgot, setForgot] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-  useEffect(() => {
-    if (!cooldown) return undefined;
-    const timer = setTimeout(() => setCooldown(n => n - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [cooldown]);
-  const [email, setEmail] = useState('');
-  const [pw, setPw] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState('');
-  const valid = /\S+@\S+\.\S+/.test(email) && (forgot || pw.length >= 6);
-  const submit = async () => {
-    if (!valid || busy || (forgot && cooldown > 0)) return;
-    setBusy(true); setErr('');
-    try {
-      if (forgot) {
-        const result = await window.LB_AUTH?.requestPasswordReset(email.trim());
-        if (!result || result.error) setErr(result?.error || '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.');
-        else { setSent(true); setCooldown(60); }
-      } else {
-        const msg = await onDone(email.trim(), pw);
-        if (msg) setErr(msg);
-      }
-    } catch { setErr('서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'); }
-    finally { setBusy(false); }
-  };
-
-  const formId = React.useId();
-  return <AuthPage
-    eyebrow={forgot ? '비밀번호 찾기' : '로그인'}
-    title={forgot ? (sent ? '메일함을 확인해 주세요' : '비밀번호를 잊으셨나요?') : emailLogin ? '이메일로 로그인' : '내 옷장을 시작해 보세요'}
-    description={forgot ? (sent ? '가입된 이메일이라면 재설정 링크를 보내드려요. 스팸함도 확인해 주세요.' : '가입한 이메일로 비밀번호 재설정 링크를 보내드려요.') : emailLogin ? '기존 이메일 계정으로 로그인해 주세요.' : '카카오나 구글 계정으로 가입하고 로그인해요.'}
-    onClose={busy ? undefined : onCancel}
-    footer={emailLogin ? <>
-      <Btn type="submit" form={formId} full size="lg" disabled={!valid || busy || (forgot && cooldown > 0)}>{busy ? (forgot ? '보내는 중…' : '로그인 중…') : forgot ? (cooldown ? `${cooldown}초 후 다시 보내기` : sent ? '재설정 메일 다시 보내기' : '재설정 메일 보내기') : '로그인'}</Btn>
-      <button type="button" className="lb-btn lb-auth-link lb-auth-back" disabled={busy} onClick={() => { if (forgot) setForgot(false); else setEmailLogin(false); setErr(''); }}>로그인 방법 선택</button>
-    </> : <button type="button" className="lb-btn lb-auth-link lb-auth-back" onClick={() => setEmailLogin(true)}>기존 이메일로 로그인</button>}
-  >
-    {!emailLogin ? <SocialLoginButtons /> : <form id={formId} className="lb-auth-form" onSubmit={(e) => { e.preventDefault(); submit(); }} aria-busy={busy}>
-      <LabeledField label="이메일" type="email" autoComplete="email" required disabled={busy} value={email} placeholder="you@example.com" onChange={value => { setEmail(value); setSent(false); setErr(''); }} />
-      {!forgot && <LabeledField label="비밀번호" type="password" autoComplete="current-password" value={pw} placeholder="비밀번호 입력" required minLength={6} disabled={busy} onChange={value => { setPw(value); setErr(''); }} />}
-      {!forgot && <button type="button" className="lb-btn lb-auth-link lb-auth-forgot" disabled={busy} onClick={() => { setForgot(true); setPw(''); setErr(''); }}>비밀번호를 잊으셨나요?</button>}
-      {err && <p className="lb-form-error" role="alert">{err}</p>}
-    </form>}
-  </AuthPage>;
-}
-
-function PasswordReset({ status, onFinish }) {
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [done, setDone] = useState(false);
-  const valid = password.length >= 6 && password === confirm;
-  const submit = async e => {
-    e.preventDefault();
-    if (!valid || busy) return;
-    setBusy(true); setError('');
-    try {
-      const result = await window.LB_AUTH.updatePassword(password);
-      if (result.error) setError(result.error);
-      else { await window.LB_AUTH.signOut(); setPassword(''); setConfirm(''); setDone(true); }
-    } catch { setError('비밀번호를 변경하지 못했어요. 다시 시도해 주세요.'); }
-    finally { setBusy(false); }
-  };
-  const formId = React.useId();
-  const expired = status === 'expired';
-  const ready = !done && status === 'ready';
-  return <AuthPage
-    eyebrow="비밀번호 재설정"
-    title={done ? '비밀번호를 변경했어요' : expired ? '링크를 다시 요청해 주세요' : '새 비밀번호를 설정해 주세요'}
-    description={done ? '새 비밀번호로 로그인하면 내 옷장을 이어서 볼 수 있어요.' : expired ? '재설정 링크가 만료되었거나 유효하지 않아요. 로그인 화면에서 메일을 다시 요청해 주세요.' : status === 'loading' ? '재설정 링크를 확인하고 있어요…' : '다른 곳에서 사용하지 않는 비밀번호를 입력해 주세요.'}
-    footer={ready ? <Btn type="submit" form={formId} full size="lg" disabled={!valid || busy}>{busy ? '변경 중…' : '비밀번호 변경'}</Btn> : (done || expired) ? <Btn full size="lg" onClick={onFinish}>로그인으로 돌아가기</Btn> : null}
-  >
-    {ready && <form id={formId} className="lb-auth-form" onSubmit={submit} aria-busy={busy}>
-      <LabeledField label="새 비밀번호" type="password" autoComplete="new-password" required minLength={6} disabled={busy} value={password} onChange={value => { setPassword(value); setError(''); }} placeholder="6자 이상 입력" hint="비밀번호는 6자 이상이어야 해요." />
-      <LabeledField label="새 비밀번호 확인" type="password" autoComplete="new-password" required minLength={6} disabled={busy} value={confirm} onChange={value => { setConfirm(value); setError(''); }} placeholder="새 비밀번호를 한 번 더 입력" error={confirm && confirm !== password ? '비밀번호가 일치하지 않아요.' : ''} />
-      {error && <p className="lb-form-error" role="alert">{error}</p>}
-    </form>}
+function Login({ onCancel }) {
+  return <AuthPage title="로그인" onClose={onCancel}>
+    <SocialLoginButtons />
   </AuthPage>;
 }
 
@@ -877,4 +787,4 @@ function Onboarding({ mode = 'signup', initial, onDone, onCancel }) {
 }
 
 // 프로필·AI 착장도 같은 얼굴 판정·문구를 쓰도록 공유한다.
-Object.assign(window, { SocialLoginButtons, Onboarding, Landing, Login, PasswordReset, countFacesInImage, faceCountError });
+Object.assign(window, { SocialLoginButtons, Onboarding, Landing, Login, countFacesInImage, faceCountError });

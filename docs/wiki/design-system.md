@@ -52,3 +52,6 @@ FeedItems의 텍스트는 브랜드14px·상품명17px·가격17px의 고정 세
 PC FeedItems는 88px 높이를 예약한다. 빈 아이템도 같은 영역에서 안내하고 반응 버튼을 같은 행에 놓는다. 본문은 좋아요 수 한 줄/글 두 줄의 최소 높이를 두되 긴 원문은 그대로 읽을 수 있다.
 
 내 공개 옷 상세는 ProductSheet의 detailAction으로 하단 공개 CTA를 받는다. CreatorProfile의 기존 toggle/data/visibilityPending을 공유해 바깥 카드와 상태·저장·실패 복원을 동기화한다. 다른 사용자 상세에는 노출하지 않는다.
+
+
+SocialLoginButtons in 07-onboarding.jsx is shared by landing, callback login and account linking. Uses Btn with equal 52px height, 12px corners and 12px gap. Provider logos align left; labels center. Kakao uses #FEE500 and a black speech symbol; Google uses white and its official gradient G. Provider brand colors and corners follow their guides. Email/password login, recovery and password settings are removed. Account email is display-only; accounts without email can save other profile fields. Official resources: https://developers.google.com/identity/branding-guidelines (G vector preserved from signin-assets.zip, button container excluded), https://developers.kakao.com/docs/ko/kakaologin/design-guide .

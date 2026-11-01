@@ -1123,3 +1123,7 @@ textarea.lb-field-control { padding-block: 11px; }
 .lb-check-field input:focus-visible { outline: 2px solid var(--ink-2); outline-offset: 3px; }
 .lb-fab::before { content: ''; position: absolute; inset: -3px; border-radius: 50%; }
 .lb-fab > svg { width: 20px; height: 20px; }
+
+/* Provider buttons are shared by landing, login and account linking. */
+.lb-social-login { display: grid; gap: 12px; }
+.lb-social-login .lb-form-error { margin: 0; }
