@@ -1447,3 +1447,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 2026-11-01: After owner-confirmed Google linking, removed email/password UI/APIs and placed provider-logo OAuth actions directly on landing. Preserved account data. [[social-login]], [[landing-copy]], [[design-system]].
 
 - 2026-11-02: 공식 표기를 RealCloset으로 통일. 단일 워드마크·웹/PWA/공유/데스크톱/확장/API 이름·패키지명 갱신, RC 아이콘 유지. GitHub/Supabase 이름 저장 확인, Render 관리 로그인은 승인 검토 차단. [[brand-name]]. 빌드/관련 테스트 4개 통과.
+
+- 2026-11-02: Vercel 프로젝트 `realcloset`(소문자 제약), GitHub 웹사이트, Supabase 복구 메일 제목/본문 저장 완료. PC/390×844 로고 확인. 운영 main push는 자동 승인 검토가 차단해 사용자 승인 대기.
