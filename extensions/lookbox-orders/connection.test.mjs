@@ -26,7 +26,7 @@ function worker(tabs = []) {
   return { handlers, calls };
 }
 
-test('only REALCLOSET pages receive replies; version comes from manifest', () => {
+test('only RealCloset pages receive replies; version comes from manifest', () => {
   const { handlers } = worker();
   let result;
   const reply = value => { result = value; };

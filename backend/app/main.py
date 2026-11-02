@@ -146,7 +146,7 @@ def _vision_client():
     """짧은 타임아웃의 분류/감지용 클라이언트. 타임아웃 시 각자 폴백으로 진행."""
     return openai_client.with_options(timeout=OPENAI_VISION_TIMEOUT)
 
-app = FastAPI(title="REALCLOSET API")
+app = FastAPI(title="RealCloset API")
 from .style_studio import router as style_studio_router
 app.include_router(style_studio_router)
 app.add_middleware(
@@ -5542,7 +5542,7 @@ def _weather_city_name(latitude: float, longitude: float) -> str:
         request = UrlRequest(
             "https://nominatim.openstreetmap.org/reverse"
             f"?format=jsonv2&lat={latitude:.4f}&lon={longitude:.4f}&zoom=10&accept-language=ko",
-            headers={"User-Agent": "REALCLOSET weather location/1.0"},
+            headers={"User-Agent": "RealCloset weather location/1.0"},
         )
         with urlopen(request, timeout=10) as response:  # noqa: S310 - fixed public geocoder URL
             address = (json.load(response).get("address") or {})
@@ -5561,7 +5561,7 @@ def _weather_observation(latitude: float, longitude: float) -> tuple[dict[str, A
         "&current=temperature_2m,apparent_temperature,weather_code&daily=temperature_2m_max,temperature_2m_min"
         "&timezone=Asia%2FSeoul&forecast_days=1"
     )
-    request = UrlRequest(url, headers={"User-Agent": "REALCLOSET weather/1.0 (+https://realcloset.vercel.app)"})
+    request = UrlRequest(url, headers={"User-Agent": "RealCloset weather/1.0 (+https://realcloset.vercel.app)"})
     with urlopen(request, timeout=8) as response:  # noqa: S310 - fixed public weather URL
         raw = json.load(response)
     return raw.get("current") or {}, raw.get("daily") or {}
@@ -8836,11 +8836,11 @@ def live_orders_extension_zip(user: UserContext = Depends(current_user)) -> Resp
                     continue
                 full = os.path.join(dirpath, name)
                 rel = os.path.relpath(full, root)
-                zf.write(full, os.path.join("REALCLOSET 구매내역", rel))
+                zf.write(full, os.path.join("RealCloset 구매내역", rel))
     return Response(
         content=buf.getvalue(),
         media_type="application/zip",
-        headers={"Content-Disposition": 'attachment; filename="REALCLOSET-orders.zip"'},
+        headers={"Content-Disposition": 'attachment; filename="RealCloset-orders.zip"'},
     )
 
 

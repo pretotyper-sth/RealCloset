@@ -1445,3 +1445,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 
 
 2026-11-01: After owner-confirmed Google linking, removed email/password UI/APIs and placed provider-logo OAuth actions directly on landing. Preserved account data. [[social-login]], [[landing-copy]], [[design-system]].
+
+- 2026-11-02: 공식 표기를 RealCloset으로 통일. 단일 워드마크·웹/PWA/공유/데스크톱/확장/API 이름·패키지명 갱신, RC 아이콘 유지. GitHub/Supabase 이름 저장 확인, Render 관리 로그인은 승인 검토 차단. [[brand-name]]. 빌드/관련 테스트 4개 통과.

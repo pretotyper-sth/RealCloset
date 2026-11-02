@@ -55,3 +55,7 @@ PC FeedItems는 88px 높이를 예약한다. 빈 아이템도 같은 영역에�
 
 
 SocialLoginButtons in 07-onboarding.jsx is shared by landing, callback login and account linking. Uses Btn with equal 52px height, 12px corners and 12px gap. Provider logos align left; labels center. Kakao uses #FEE500 and a black speech symbol; Google uses white and its official gradient G. Provider brand colors and corners follow their guides. Email/password login, recovery and password settings are removed. Account email is display-only; accounts without email can save other profile fields. Official resources: https://developers.google.com/identity/branding-guidelines (G vector preserved from signin-assets.zip, button container excluded), https://developers.kakao.com/docs/ko/kakaologin/design-guide .
+
+## 워드마크 — 2026-11-02
+
+`Wordmark`는 `RealCloset` 단일 텍스트, Helvetica Neue/서비스 글꼴, weight 500을 쓴다. Real/Closet을 배지로 분리하지 않는다. 기존 size/onClick/키보드 접근성/높이를 유지한다. [[brand-name]].

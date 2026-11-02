@@ -102,3 +102,5 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - [social-login](social-login.md) — 카카오·구글 OAuth와 기존 계정 연결·이메일 가입 종료·HSB 앱 재사용
 
 - Social-only entry and email login removal: [social-login](social-login.md), [design-system](design-system.md).
+
+- [brand-name](brand-name.md) — 공식 표기 RealCloset·단일 워드마크·GitHub/Supabase 이름·RC 아이콘 유지

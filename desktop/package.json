@@ -1,6 +1,7 @@
 {
-  "name": "lookbox-desktop",
+  "name": "realcloset-desktop",
   "private": true,
+  "productName": "RealCloset",
   "version": "0.1.0",
   "main": "main.cjs",
   "scripts": {

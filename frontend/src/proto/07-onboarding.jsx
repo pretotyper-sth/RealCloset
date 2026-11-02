@@ -3,7 +3,7 @@ const React = window.React;
 const { AuthPage, Btn, Chip, Eyebrow, Icon, LB_DATA, NumberSlider, PALETTE, PERSONAL_COLORS, SmartImg, useEscapeClose, WARDROBE, Wordmark } = window;
 
 /* global React, Btn, Chip, Icon, Wordmark, Eyebrow, LabeledField, Thumb, LB_DATA */
-// REALCLOSET — 회원가입 / 선호 정보 온보딩. 단계별(step) 흐름.
+// RealCloset — 회원가입 / 선호 정보 온보딩. 단계별(step) 흐름.
 // 가입 시 선호 정보(스타일·핏·컬러)를 필수로 받고, 이후 '내 스타일'에서 수정 가능.
 
 const { useState, useEffect, useRef } = React;

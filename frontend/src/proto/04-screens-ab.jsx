@@ -6,7 +6,7 @@ const React = window.React;
 const { useScrollTopOn, Badge, BottomSheet, Btn, CATEGORIES, Chip, ChipMultiField, EmptyState, Icon, IconBtn, LB_DATA, LabeledField, PullRefresh, WardrobeMilestoneBanner, RecentTagField, STORE_RECENT_KEY, rememberStore, Skeleton, Thumb } = window;
 
 /* global React, Thumb, Skeleton, Btn, Chip, Badge, IconBtn, Icon, BottomSheet, LB_DATA, EmptyState */
-// REALCLOSET — screens A–E + layout chrome. Exported to window.
+// RealCloset — screens A–E + layout chrome. Exported to window.
 
 const { useState: useS, useEffect: useE, useRef: useR } = React;
 
@@ -17,14 +17,7 @@ const { useState: useS, useEffect: useE, useRef: useR } = React;
 function Wordmark({ size = 19, onClick }) {
   const box = { display: 'inline-flex', alignItems: 'center', gap: 5, userSelect: 'none', height: 24 };
   const mark = (
-    <>
-      <span style={{ fontWeight: 800, fontSize: size, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1 }}>REAL</span>
-      <span style={{
-        fontWeight: 800, fontSize: size - 2, letterSpacing: '-0.01em', lineHeight: 1,
-        background: 'var(--accent)', color: 'var(--accent-ink)',
-        padding: '3px 7px', borderRadius: 7,
-      }}>CLOSET</span>
-    </>
+    <span style={{ fontFamily: "'Helvetica Neue', var(--font)", fontWeight: 500, fontSize: size, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1 }}>RealCloset</span>
   );
   if (!onClick) return <div style={box}>{mark}</div>;
   return (
@@ -1130,7 +1123,7 @@ function OrderDemoBrowser({ platform, phase, count, onLogin, demo = false, colle
           <div className="lb-order-demo-success">
             <span><Icon name="check" size={18} stroke={2.5} /></span>
             <h3>로그인 완료</h3>
-            <p>Lookbox가 주문내역 페이지를 열 준비가 됐어요.</p>
+            <p>RealCloset이 주문내역 페이지를 열 준비가 됐어요.</p>
           </div>
         )}
       </div>
@@ -1153,9 +1146,9 @@ function OrderStorePreview({ step, onClose, onAdd }) {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18, marginTop: 36 }}>
             <div style={{ width: 72, height: 72, borderRadius: 16, background: '#1A1A1A', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 26, fontWeight: 800 }}>R</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ margin: 0, fontSize: 24, lineHeight: 1.25, letterSpacing: '-.03em' }}>REALCLOSET 구매내역</h2>
-              <p style={{ margin: '7px 0 0', color: '#5f6368', fontSize: 14 }}>REALCLOSET 제공 · 쇼핑</p>
-              <p style={{ margin: '18px 0 0', color: '#3c4043', fontSize: 14, lineHeight: 1.6 }}>로그인된 쇼핑몰의 주문내역에서 고른 옷을 REALCLOSET 옷장에 담습니다.</p>
+              <h2 style={{ margin: 0, fontSize: 24, lineHeight: 1.25, letterSpacing: '-.03em' }}>RealCloset 구매내역</h2>
+              <p style={{ margin: '7px 0 0', color: '#5f6368', fontSize: 14 }}>RealCloset 제공 · 쇼핑</p>
+              <p style={{ margin: '18px 0 0', color: '#3c4043', fontSize: 14, lineHeight: 1.6 }}>로그인된 쇼핑몰의 주문내역에서 고른 옷을 RealCloset 옷장에 담습니다.</p>
             </div>
           </div>
           <div style={{ marginTop: 30, borderTop: '1px solid #E0E3E7', paddingTop: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
@@ -1168,7 +1161,7 @@ function OrderStorePreview({ step, onClose, onAdd }) {
         {step === 'confirm' ? (
           <div style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', background: 'rgba(0,0,0,.24)', padding: 24 }}>
             <div style={{ width: 'min(382px, 100%)', borderRadius: 14, background: '#fff', padding: 22, boxShadow: '0 18px 48px rgba(0,0,0,.28)' }}>
-              <div style={{ fontSize: 17, fontWeight: 750 }}>‘REALCLOSET 구매내역’을 추가하시겠어요?</div>
+              <div style={{ fontSize: 17, fontWeight: 750 }}>‘RealCloset 구매내역’을 추가하시겠어요?</div>
               <p style={{ margin: '12px 0 0', fontSize: 13.5, lineHeight: 1.55, color: '#5f6368' }}>선택한 쇼핑몰 주문내역에서 상품 정보와 이미지를 읽을 수 있어요.</p>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 22 }}>
                 <button type="button" onClick={() => onAdd('store')} style={{ height: 38, padding: '0 13px', color: '#1A73E8', fontWeight: 700 }}>취소</button>

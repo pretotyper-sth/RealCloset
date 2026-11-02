@@ -7,7 +7,7 @@ import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
 
 test('landing renders social login actions directly, with provider logos', async () => {
-  const window = {React, LB_AUTH: {socialError:''}, LB_DATA:{IMG:{}}, Wordmark:()=>React.createElement('span',null,'REALCLOSET'), Icon:()=>React.createElement('span')};
+  const window = {React, LB_AUTH: {socialError:''}, LB_DATA:{IMG:{}}, Wordmark:()=>React.createElement('span',null,'RealCloset'), Icon:()=>React.createElement('span')};
   const shared=readFileSync(new URL('../src/proto/02-shared.jsx',import.meta.url),'utf8');
   const button=shared.slice(shared.indexOf('function Btn('),shared.indexOf('function Chip('));
   const btnCode=await transformWithOxc(button+'\nwindow.Btn=Btn;','button.jsx',{jsx:{runtime:'classic'}});
