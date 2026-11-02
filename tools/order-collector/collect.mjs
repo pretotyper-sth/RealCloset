@@ -417,7 +417,7 @@ function listenEmbedInput(getPage, getCdp) {
       const { execSync } = await import('node:child_process');
       if (process.platform === 'darwin') { execSync('pbcopy', { input: oneLine }); console.log('\n클립보드에 복사했어요.'); }
     } catch { /* 클립보드 실패는 무시 — 파일이 있다 */ }
-    console.log('REALCLOSET에서 [아이템 추가 → URL] 칸에 붙여넣으면 고를 수 있어요.\n');
+    console.log('RealCloset에서 [아이템 추가 → URL] 칸에 붙여넣으면 고를 수 있어요.\n');
   }
 
   if (!flag('keep-open')) {

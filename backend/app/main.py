@@ -8853,7 +8853,7 @@ def live_orders_collect(
     if host not in ("127.0.0.1", "::1"):
         raise HTTPException(
             status_code=403,
-            detail="이 컴퓨터에서 실행 중인 REALCLOSET에서만 쇼핑몰 창을 열 수 있어요.",
+            detail="이 컴퓨터에서 실행 중인 RealCloset에서만 쇼핑몰 창을 열 수 있어요.",
         )
     platform = re.sub(r"[^a-z0-9]", "", (body.platform or "musinsa").lower()) or "musinsa"
     view_w = max(280, min(720, int(body.width or 384)))

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-LOOKBOX Analytics Server
+RealCloset Analytics Server
 실행: uv run --with flask --with openai --with pillow --with beautifulsoup4 --with curl_cffi --with rembg --with onnxruntime python3 server.py
 
 Landing:   http://localhost:8080
@@ -1697,7 +1697,7 @@ def static_root(path):
     except: abort(404)
 
 if __name__ == '__main__':
-    print(f'\n  LOOKBOX Analytics Server')
+    print(f'\n  RealCloset Analytics Server')
     print(f'  Landing:   http://localhost:8080')
     print(f'  Dashboard: http://localhost:8080/dashboard  (PW: {DASH_PW})')
     port = int(os.environ.get('PORT', 8080))
