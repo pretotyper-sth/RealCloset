@@ -1837,7 +1837,7 @@ function App() {
   const goHome = () => {
     try {
       const u = new URL(location.href);
-      u.searchParams.set('tab', 'decision');
+      u.searchParams.set('tab', 'wardrobe');
       u.hash = '';
       location.replace(u.pathname + u.search);
     } catch (e) { location.reload(); }
