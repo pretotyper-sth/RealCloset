@@ -686,14 +686,14 @@ function WardrobeScreen({ ctx }) {
               fontSize: 12, fontWeight: 600, color: 'var(--ink-2)', padding: '4px 2px',
               marginRight: wide ? 0 : 'auto', flex: 'none',
             }}>{wide ? '선택 해제' : '해제'}</button>
+            {!viewingArchive && <Btn size="sm" variant="soft" icon={wide ? 'sparkle' : undefined} onClick={() => runPickedCoord()}
+              style={{ fontSize: 12, padding: wide ? '7px 12px' : '6px 10px', flex: 'none', whiteSpace: 'nowrap' }}>코디</Btn>}
             <Btn size="sm" variant="soft" icon={wide ? (viewingArchive ? 'hanger' : 'archive') : undefined} onClick={runBulkArchive}
               style={{ fontSize: 12, padding: wide ? '7px 12px' : '6px 10px', flex: 'none' }}>
               {viewingArchive ? '옷장으로' : '보관'}
             </Btn>
             <Btn size="sm" icon={wide ? "trash" : undefined} onClick={() => setBulkDelAsk(true)}
               style={{ background: '#B0573C', color: '#fff', fontSize: 12, padding: wide ? '7px 12px' : '6px 10px', flex: 'none' }}>삭제</Btn>
-            {!viewingArchive && <Btn size="sm" variant="soft" icon={wide ? 'sparkle' : undefined} onClick={() => runPickedCoord()}
-              style={{ fontSize: 12, padding: wide ? '7px 12px' : '6px 10px', flex: 'none', whiteSpace: 'nowrap' }}>코디</Btn>}
           </div>
         </div>
       )}
