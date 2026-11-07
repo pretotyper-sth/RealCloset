@@ -2648,7 +2648,7 @@ function App() {
     setItems(nextOwned);
     setArchived(nextArchived);
     syncDailyAfterWardrobeChange(nextOwned, nextArchived);
-    showToast('옷장에서 삭제했어요', 'check');
+    showToast('옷장에서 삭제했어요', 'trash');
     setItemStatus(t.id, 'delete');
   };
   const bulkArchive = (ids) => {
@@ -2692,7 +2692,7 @@ function App() {
     setItems(nextOwned);
     setArchived(nextArchived);
     syncDailyAfterWardrobeChange(nextOwned, nextArchived);
-    showToast(idSet.size + '개를 삭제했어요', 'check');
+    showToast(idSet.size + '개를 삭제했어요', 'trash');
     setItemStatus([...idSet], 'delete');
   };
 
@@ -2914,7 +2914,7 @@ function App() {
   };
   const addToWardrobe = (itemId) => {
     setAddedItemIds((a) => a.includes(itemId) ? a : [...a, itemId]);
-    showToast('옷장에 추가됨', 'check');
+    showToast('옷장에 담았어요', 'check');
   };
 
   // Commit a batch of garments separated from one photo/URL (sequential add flow).
@@ -2968,7 +2968,7 @@ function App() {
       if (skippedIds && skippedIds.length) discardLiveItems(skippedIds);
       putLiveItems(finalList, true);
       closeAdd();
-      showToast(finalList.length + '개 담았어요', 'check');
+      showToast('옷장에 ' + finalList.length + '개 담았어요', 'check');
       return true;
     } catch (e) {
       showToast(e.message || '옷장에 저장하지 못했어요. 다시 눌러 주세요.');
