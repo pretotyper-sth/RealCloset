@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "RealCloset 구매내역",
-  "version": "0.3.46",
+  "version": "0.3.47",
   "homepage_url": "https://realcloset.vercel.app/",
   "description": "로그인된 크롬에서 쇼핑몰 주문내역을 읽어 RealCloset 옷장에 담습니다.",
   "icons": {

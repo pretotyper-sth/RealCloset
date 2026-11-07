@@ -785,7 +785,7 @@ function DetectRow({ item, on, onToggle }) {
 
 const URL_IMPORT_BLOCKED_MSG = '이미지 불러오기가 제한되는 URL이에요. 사진으로 추가해 주세요.';
 const URL_IMPORT_BLOCKED_HOST = /(^|\.)(coupang\.com|smartstore\.naver\.com|brand\.naver\.com|shopping\.naver\.com|11st\.co\.kr|gmarket\.co\.kr|auction\.co\.kr|ssg\.com|kurly\.com|wemakeprice\.com|tmon\.co\.kr)$/i;
-const ORDER_EXTENSION_STORE_URL = import.meta.env.VITE_ORDER_EXTENSION_STORE_URL || '';
+const ORDER_EXTENSION_STORE_URL = import.meta.env.VITE_ORDER_EXTENSION_STORE_URL || 'https://chromewebstore.google.com/detail/lkajnibihdnoiogalhngecodcpkjlobc';
 const ORDER_EDGE_EXTENSION_STORE_URL = import.meta.env.VITE_ORDER_EDGE_EXTENSION_STORE_URL || ORDER_EXTENSION_STORE_URL;
 
 function canFetchOrderImages(version) {
