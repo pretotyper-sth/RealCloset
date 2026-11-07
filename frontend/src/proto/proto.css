@@ -765,7 +765,7 @@ img { display: block; max-width: 100%; }
 /* ---- toast ---- */
 .lb-toast {
   position: absolute; left: 50%; bottom: 132px; transform: translateX(-50%) translateY(8px);
-  z-index: 70; opacity: 0; pointer-events: none;
+  z-index: 100; opacity: 0; pointer-events: none;
   /* 토스트는 기본 CTA(담고 완료·조합 추천받기·저장)보다 충분히 위에서 뜬다. 검정이면 버튼과
      같은 계열이라 묻히고, 흰/아이보리면 페이지 배경과 같은 계열이라 또 묻힌다.
      그래서 팔레트에 이미 있는 테라코타(#B0573C — 선택 플로팅 메뉴의 삭제 버튼과
@@ -774,7 +774,8 @@ img { display: block; max-width: 100%; }
   font-size: 13.5px; font-weight: 700;
   padding: 11px 18px; border-radius: var(--r-pill);
   box-shadow: var(--pop-shadow);
-  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; width: max-content; max-width: calc(100% - 32px);
+  box-sizing: border-box; word-break: keep-all;
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .lb-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }

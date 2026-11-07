@@ -1554,10 +1554,10 @@ function App() {
     const first = (text.split(/(?<=[.!?])\s+/)[0] || text).replace(/\.$/, '');
     return first.length <= 22 ? first : first.slice(0, 21) + '…';
   };
-  const showToast = useCallback((msg, icon) => {
-    setToast({ msg: shortToast(msg), icon });
+  const showToast = useCallback((msg, icon, { extended = false } = {}) => {
+    setToast({ msg: extended ? msg : shortToast(msg), icon });
     clearTimeout(toastT.current);
-    toastT.current = setTimeout(() => setToast(null), 1900);
+    toastT.current = setTimeout(() => setToast(null), extended ? 4000 : 1900);
   }, []);
 
   const putLiveItems = useCallback((list, prepend = false) => {
@@ -1994,7 +1994,13 @@ function App() {
       });
       reloadBilling();
       return n;
+    } catch (error) {
+      if (!force) throw error;
+      return completed.size;
     } finally {
+      if (force && targets.some(outfit => !completed.has(outfit.id))) {
+        showToast('착장 이미지 생성에 실패했어요. 잠시 후 다시 시도해 주세요.', undefined, { extended: true });
+      }
       targets.forEach((o) => {
         lookInflight.current.delete(o.id);
         if (!completed.has(o.id)) {
@@ -2007,7 +2013,7 @@ function App() {
       });
       bumpDaily();
     }
-  }, [prefs.gender, prefs.personalModelLook, prefs.avatar, prefs.height, prefs.weight, dailyStyle, items, bumpDaily, reloadBilling]);
+  }, [prefs.gender, prefs.personalModelLook, prefs.avatar, prefs.height, prefs.weight, dailyStyle, items, bumpDaily, reloadBilling, showToast]);
 
   // 페이지 진입과 저장 코디 복원은 새 AI 이미지를 생성하지 않는다.
 
@@ -3010,7 +3016,7 @@ function App() {
     dailyEnabled, setDailyEnabled,
     modelLook: !!prefs.modelLook, setModelLook,
     pickedModelLook: pickedLookSettings.enabled, pickedModelLookConfirmed: pickedLookSettings.confirmed, setPickedModelLook,
-    applyModelLooks: (list) => applyModelLooks(list, true).catch((e) => { showToast(e.message || 'AI 착장 이미지를 만들지 못했어요'); return 0; }),
+    applyModelLooks: (list) => applyModelLooks(list, true),
     personalModelLook: !!prefs.personalModelLook, onTogglePersonalModelLook, personalSetupOpen,
     closePersonalSetup: () => setPersonalSetupOpen(false), savePersonalModelLook,
     dailyWardrobeGrew: dailyWardrobeGrewSinceCache(items),
@@ -3024,7 +3030,7 @@ function App() {
       .map((it) => normalizeProductUrl(it && it.sourceUrl))
       .filter(Boolean),
     openAdd, closeAdd, confirmAdd, startCombo, reviewConsideration, decidePurchase, saveOutfit, toggleSaveOutfit, requestUnsave, bulkUnsave, renameSavedLook, createManualLook, openDetail, addToWardrobe, back,
-    openItem, openImageViewer, openOutfitViewer, applyModelLooks, requestRemove, bulkArchive, bulkRestore, bulkDelete, openPrefs, openAccount, setAvatar, logout, prefs, go, goHome,
+    openItem, openImageViewer, openOutfitViewer, requestRemove, bulkArchive, bulkRestore, bulkDelete, openPrefs, openAccount, setAvatar, logout, prefs, go, goHome,
     openTryOn, openTryOnSetup, openTryOnTab, startTryOn, setTryOnFrame, makeTryOnBody, formatTryOnErr, tryOnMaking, tryOnMakingSubject, tryOnProgress, tryOnErrors,
     setTryOnActive, saveTryOnOther,
     liveReplaceItemImage, liveConfirmReplaceImage, applyReextractItem,
@@ -3170,7 +3176,7 @@ function App() {
         onDelete={deleteItem}
         onReextract={requestReextract}
         onRecommend={item => startPickedOutfits([item.id], { inlineItemId: item.id })}
-        recommendation={pickSheet && pickSheet.inlineItemId === (removeSheet.item && removeSheet.item.id) ? <PickedOutfitsModal embedded state={pickSheet} wide={false} onClose={closePickSheet} onMore={() => requestPickedOutfits(pickSheet.ids, { append: true, externalOnly: pickSheet.externalOnly })} savedOutfitIds={savedOutfitIds} onSave={toggleSaveOutfit} onMakeModelLook={outfit => applyModelLooks(outfit, true).then(() => setPickSheet(cur => cur ? { ...cur, outfits: cur.outfits.slice() } : cur)).catch(e => showToast(e.message))} onOpen={look => { const outfit = LB_DATA.OUTFIT_BY_ID[look.outfitId]; if (outfit) openOutfitViewer(window.LOOK_IMAGE_MODES[outfit.id] === false ? { ...outfit, lookImg: null } : outfit, (outfit.itemIds || []).map(id => LB_DATA.ALL[id]).filter(Boolean)); }} /> : null}
+        recommendation={pickSheet && pickSheet.inlineItemId === (removeSheet.item && removeSheet.item.id) ? <PickedOutfitsModal embedded state={pickSheet} wide={false} onClose={closePickSheet} onMore={() => requestPickedOutfits(pickSheet.ids, { append: true, externalOnly: pickSheet.externalOnly })} savedOutfitIds={savedOutfitIds} onSave={toggleSaveOutfit} onMakeModelLook={outfit => applyModelLooks(outfit, true).then(() => setPickSheet(cur => cur ? { ...cur, outfits: cur.outfits.slice() } : cur))} onOpen={look => { const outfit = LB_DATA.OUTFIT_BY_ID[look.outfitId]; if (outfit) openOutfitViewer(window.LOOK_IMAGE_MODES[outfit.id] === false ? { ...outfit, lookImg: null } : outfit, (outfit.itemIds || []).map(id => LB_DATA.ALL[id]).filter(Boolean)); }} /> : null}
         onExpand={() => {
           const t = removeSheet.item;
           closeRemove();
@@ -3285,14 +3291,14 @@ function App() {
           onMore={() => requestPickedOutfits(pickSheet.ids, { append: true, externalOnly: pickSheet.externalOnly })}
           savedOutfitIds={savedOutfitIds}
           onSave={toggleSaveOutfit}
-          onMakeModelLook={outfit => applyModelLooks(outfit, true).then(() => setPickSheet(cur => cur ? { ...cur, outfits: cur.outfits.slice() } : cur)).catch(e => showToast(e.message))}
+          onMakeModelLook={outfit => applyModelLooks(outfit, true).then(() => setPickSheet(cur => cur ? { ...cur, outfits: cur.outfits.slice() } : cur))}
           onOpen={(look, looks) => { closePickSheet(); openDetail(look, looks, '이 옷으로 만든 다른 코디'); }}
           wide={wide}
         />
       )}
 
       {toast && (
-        <div className={'lb-toast show'}>
+        <div className={'lb-toast show'} role="status">
           {toast.icon && <Icon name={toast.icon} size={15} stroke={2.4} fill={toast.icon === 'bookmark' ? 'currentColor' : 'none'} />}
           {toast.msg}
         </div>
