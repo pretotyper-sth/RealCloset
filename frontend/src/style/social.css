@@ -133,3 +133,9 @@
  .rc-feed .rc-feed-heading,.rc-feed .rc-feed-head-actions{height:24px}
  .rc-feed-head-actions{margin-top:0}
 }
+
+@media(min-width:760px){
+ .rc-feed-library .rc-personal-toolbar{margin-inline:0;padding-inline-start:16px}
+ .rc-feed-library .rc-personal-toolbar .rc-personal-shortcuts{gap:6px}
+ .rc-feed-library .rc-personal-toolbar .rc-saved-shortcut{display:grid;place-items:center;width:44px;padding:0}
+}

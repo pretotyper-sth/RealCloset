@@ -1451,3 +1451,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-02: Vercel 프로젝트 `realcloset`(소문자 제약), GitHub 웹사이트, Supabase 복구 메일 제목/본문 저장 완료. PC/390×844 로고 확인. 운영 main push는 자동 승인 검토가 차단해 사용자 승인 대기.
 
 - 2026-11-02: 사용자 운영 배포 승인 후 30d1337 main push 및 Vercel Ready 확인. 최종 점검에서 조사와 붙어 있는 확장 안내/개인정보처리방침/수집기/API 오류 문구 표기와 Analytics 인증창 이름도 보정. Render GitHub 로그인은 배포용 계정이라는 오류로 실패, Google 로그인 전환은 자동 승인 검토에서 별도 승인 요구. Supabase 브라우저가 다른 계정으로 전환돼 SMTP 발신자명은 재확인 불가.
+
+- 2026-11-07: 공통 Wordmark에 Outfit 600과 RealCloset 표기를 적용했다. 근거: `frontend/src/proto/04-screens-ab.jsx:17`.

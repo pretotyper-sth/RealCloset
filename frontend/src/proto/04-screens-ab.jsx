@@ -15,10 +15,11 @@ const { useState: useS, useEffect: useE, useRef: useR } = React;
    ============================================================ */
 // onClick — 앱 안에서는 홈(옷장) 버튼. 가입 전 화면(랜딩·로그인·온보딩)은 넘기지 않아 그냥 로고로 남는다.
 function Wordmark({ size = 19, onClick }) {
-  const box = { display: 'inline-flex', alignItems: 'center', gap: 5, userSelect: 'none', height: 24 };
-  const mark = (
-    <span style={{ fontFamily: "'Helvetica Neue', var(--font)", fontWeight: 500, fontSize: size, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1 }}>RealCloset</span>
-  );
+  const box = {
+    display: 'inline-flex', alignItems: 'center', userSelect: 'none', height: 24,
+    fontFamily: 'Outfit, var(--font)', fontWeight: 600, fontSize: size, lineHeight: 1, color: 'var(--ink)',
+  };
+  const mark = 'RealCloset';
   if (!onClick) return <div style={box}>{mark}</div>;
   return (
     <button type="button" onClick={onClick} aria-label="옷장으로 이동"
