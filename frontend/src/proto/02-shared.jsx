@@ -464,7 +464,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
       </div>
     ) : (Composite ? (
       <div style={{ width: '100%', height: '100%', minWidth: 0, minHeight: 0 }}>
-        <Composite outfit={outfit} items={outfitItems} ratio="4 / 5" infoButton fullResolution />
+        <Composite key={JSON.stringify([outfit.id, ...outfitItems.map(item => [item.id, item.img, item.thumb])])} outfit={outfit} items={outfitItems} ratio="4 / 5" infoButton fullResolution />
       </div>
     ) : null)
   ) : (

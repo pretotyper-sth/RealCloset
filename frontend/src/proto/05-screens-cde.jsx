@@ -344,7 +344,7 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
   const shown = cleanItems.filter((it) => it.img);
   const place = lookPlacement(shown);
   const key = shown.map((it) => String(it.id) + ':' + (fullResolution ? it.img : it.thumb || it.img)).join('|') + '|flat19|' + ratio;
-  const [flat, setFlat] = useSc(fullResolution ? '' : LOOK_FLAT_CACHE[key] || '');
+  const [flat, setFlat] = useSc(fullResolution ? null : LOOK_FLAT_CACHE[key] || '');
   const [copyState, setCopyState] = useSc('');
   const [showInfo, setShowInfo] = useSc(false);
   const lookImg = outfit && outfit.lookImg;
@@ -462,10 +462,11 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
     );
   }
   const pending = looking || !!(outfit && lookPendingStage(outfit));
+  const preparing = fullResolution && shown.length > 0 && flat === null;
   return (
     <div
-      aria-busy={pending ? 'true' : undefined}
-      aria-label={pending ? '코디 이미지를 만드는 중' : undefined}
+      aria-busy={pending || preparing ? 'true' : undefined}
+      aria-label={preparing ? '코디 이미지를 불러오는 중' : pending ? '코디 이미지를 만드는 중' : undefined}
       style={{
         containerType: 'inline-size', position: 'relative', width: '100%', background: bg, borderRadius: 'var(--r-md)', overflow: 'hidden', aspectRatio: ratio,
         boxShadow: lined ? 'inset 0 0 0 1px var(--line)' : undefined,
@@ -478,9 +479,12 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
           alt={shown.map((i) => i.name).join(' · ')}
           style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center', display: 'block', animation: 'lb-fade-swap 260ms var(--ease)',
+            objectFit: 'cover', objectPosition: 'center', display: 'block', animation: fullResolution ? undefined : 'lb-fade-swap 260ms var(--ease)',
           }}
         />
+      ) : fullResolution ? (
+        preparing ? <Skeleton h="100%" style={{ position: 'absolute', inset: 0 }} /> :
+          <span style={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center', padding: 18, textAlign: 'center', fontSize: 13 }}>코디 이미지를 불러오지 못했어요.</span>
       ) : shown.map((it) => {
         const at = place[it.id] || LOOK_SPOT.top;
         const cell = layerSafeCells(shown)[it.id];
@@ -490,18 +494,14 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
         };
         return (
           <div key={it.id} style={frame}>
-            <img src={fullResolution ? it.img : (it.thumb || it.img)} alt={it.name} loading={fullResolution ? 'eager' : 'lazy'}
-              onError={fullResolution && it.thumb && it.thumb !== it.img ? event => {
-                const image = event.currentTarget;
-                if (image.getAttribute('src') !== it.thumb) image.src = it.thumb;
-              } : undefined} decoding="async" style={{
+            <img src={it.thumb || it.img} alt={it.name} loading="lazy" decoding="async" style={{
               width: '100%', height: '100%', objectFit: 'contain', display: 'block',
             }} />
           </div>
         );
       })}
-      {infoControl}
-      {shown.some(item => item.wish) && <span className={'lb-look-ai-mark' + (aiMark === 'icon' ? ' icon' : '')} aria-label="AI 생성 상품 포함" title="AI 생성 상품 포함" style={aiMarkStyle}><span>✦</span>{aiMark === 'icon' ? null : <span className="lb-look-ai-mark-label"> AI 생성</span>}</span>}
+      {(!fullResolution || flat) && infoControl}
+      {(!fullResolution || flat) && shown.some(item => item.wish) && <span className={'lb-look-ai-mark' + (aiMark === 'icon' ? ' icon' : '')} aria-label="AI 생성 상품 포함" title="AI 생성 상품 포함" style={aiMarkStyle}><span>✦</span>{aiMark === 'icon' ? null : <span className="lb-look-ai-mark-label"> AI 생성</span>}</span>}
       {pending ? <LookPendingMarks /> : null}
       {copyControl}
       {copyState ? (
