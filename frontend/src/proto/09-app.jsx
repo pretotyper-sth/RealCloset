@@ -1014,6 +1014,9 @@ function App() {
   const [onboarded, setOnboarded] = useState(() => {
     if (forceOnb) return false;
     if (isShowcase) return true;            // 캔버스 쇼케이스는 온보딩 건너뜀
+    if (import.meta.env.PROD && window.LB_AUTH?.configured) {
+      return document.getElementById('root')?.dataset.boot === 'home';
+    }
     try { return localStorage.getItem('lb_onboarded') === '1'; } catch (e) { return false; }
   });
   const [prefs, setPrefs] = useState(() => {
@@ -1056,6 +1059,11 @@ function App() {
       if (me) setAuthUid(me.id);
       if (me && !me.anonymous) {
         if (window.LB_AUTH.socialError) { setAccountSheet(true); showToast(window.LB_AUTH.socialError); }
+        const url = new URL(location.href);
+        if (url.searchParams.get('auth') === 'social' && !window.LB_AUTH.socialError) {
+          url.searchParams.delete('auth');
+          history.replaceState(history.state, '', url);
+        }
         const social = me.providers?.some(provider => provider === 'google' || provider === 'kakao');
         if (social && !me.prefs?.onboardingComplete && !(me.prefs?.gender && me.prefs?.styles?.length && me.prefs?.fit)) {
           // 새 계정은 이 브라우저에 남은 다른 사용자의 설정을 가져오지 않는다.

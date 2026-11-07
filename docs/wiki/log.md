@@ -1461,3 +1461,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-07: 첫 HTML에 스켈레톤을 표시하고 화면 모듈을 함께 불러온다. 피드는 목록·계정 상태가 오면 표시하고 편집기는 열 때만 로드한다. 근거: `frontend/index.html`, `frontend/src/main.jsx`, `frontend/src/style/experience.jsx`.
 
 - 2026-11-07: 구매내역 확장 0.3.47의 공개 게시 상태를 확인하고 앱 설치 링크를 연결했다. [Chrome 웹스토어](chrome-extension-publish.md)
+
+- 2026-11-07: 로그인 후 새로고침 시 현재 탭 스켈레톤을 표시하고 성공한 소셜 콜백 표식을 지운다. 콜라주 위치 스타일은 편집기와 분리해 피드에서도 즉시 로드한다. 근거: `frontend/index.html`, `frontend/src/proto/09-app.jsx`, `frontend/src/style/collage-canvas.css`.

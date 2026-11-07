@@ -1,3 +1,4 @@
+import './collage-canvas.css';
 import React, { useRef, useState } from 'react';
 import { BACKGROUNDS } from './model.js';
 import { outfitPrice } from '../look-layout.js';

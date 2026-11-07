@@ -15,8 +15,10 @@
       <script>
         (() => {
           const params = new URLSearchParams(location.search)
-          if (params.get('onboarding') === '1' || params.has('auth') || params.has('reset')) return
+          if (params.get('onboarding') === '1' || params.has('reset')) return
           const root = document.getElementById('root')
+          const tab = params.get('screen') || params.get('tab') || 'wardrobe'
+          root.dataset.bootTab = ['feed', 'today', 'lookbook', 'mypage', 'decision'].includes(tab) ? tab : 'wardrobe'
           if (params.has('screen') || params.has('style') || params.has('vote')) {
             root.dataset.boot = 'home'
             return
@@ -52,6 +54,22 @@
           .rc-boot-home { padding-inline: 32px; margin-left: 244px; }
           .rc-boot-home::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 243px; border-right: 1px solid #dfdbd1; }
           .rc-boot-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
+        #root[data-boot-tab="feed"] .rc-boot-grid { grid-template-columns: minmax(0, 1fr); }
+        #root[data-boot-tab="feed"] .rc-boot-grid .rc-boot-shape,
+        #root[data-boot-tab="today"] .rc-boot-grid .rc-boot-shape,
+        #root[data-boot-tab="lookbook"] .rc-boot-grid .rc-boot-shape { aspect-ratio: 4 / 5; }
+        #root[data-boot-tab="feed"] .rc-boot-grid .rc-boot-shape { max-height: 640px; }
+        #root[data-boot-tab="today"] .rc-boot-grid,
+        #root[data-boot-tab="lookbook"] .rc-boot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        #root:is([data-boot-tab="mypage"], [data-boot-tab="decision"]) .rc-boot-grid { display: block; max-width: 680px; }
+        #root:is([data-boot-tab="mypage"], [data-boot-tab="decision"]) .rc-boot-grid .rc-boot-shape { aspect-ratio: auto; height: 52px; margin-bottom: 12px; }
+        @media (min-width: 760px) {
+          #root:is([data-boot-tab="feed"], [data-boot-tab="today"], [data-boot-tab="lookbook"]) .rc-boot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (min-width: 1380px) {
+          #root[data-boot-tab="feed"] .rc-boot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          #root:is([data-boot-tab="today"], [data-boot-tab="lookbook"]) .rc-boot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
         @media (prefers-reduced-motion: no-preference) {
           .rc-boot-shape { background: linear-gradient(100deg, #e1ded5 30%, #f4f1e9 50%, #e1ded5 70%); background-size: 240% 100%; animation: rc-boot-shimmer 1.5s linear infinite; }
