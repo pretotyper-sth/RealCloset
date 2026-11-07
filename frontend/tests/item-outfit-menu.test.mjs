@@ -30,7 +30,7 @@ test('reopening a running item request avoids duplicate requests and disabling A
 });
 test('recommendation remains inside the item menu and supports the existing save action',()=>{
  const shared=readFileSync(new URL('../src/proto/02-shared.jsx',import.meta.url),'utf8');const card=readFileSync(new URL('../src/proto/05-screens-cde.jsx',import.meta.url),'utf8');const today=readFileSync(new URL('../src/proto/06-today.jsx',import.meta.url),'utf8');
- assert.ok(shared.includes('recommendation || <>'));assert.ok(shared.includes('이 옷으로 코디 추천받기'));assert.ok(shared.includes('icon="imageEdit"'));assert.ok(card.includes('if (embedded) return body'));assert.ok(card.includes('onSave && onSave(o.id)'));assert.ok(source.includes('pickSheet && !pickSheet.inlineItemId'));assert.ok(today.includes('infoRight={59} infoSize={24} infoBottom={7}'));assert.ok(today.includes('useModelLook ? "product" : "sparkle"'));assert.ok(card.includes('AI 생성 상품 포함'));
+ assert.ok(shared.includes('recommendation || <>'));assert.ok(shared.includes('이 옷으로 코디 추천받기'));assert.ok(shared.includes('icon="imageEdit"'));assert.ok(card.includes('if (embedded) return body'));assert.ok(card.includes('onSave && onSave(o.id)'));assert.ok(source.includes('pickSheet && !pickSheet.inlineItemId'));assert.ok(today.includes('infoRight={actionInset + 2 * actionStep} infoSize={actionSize} infoBottom={actionInset}'));assert.ok(today.includes('useModelLook ? "product" : "sparkle"'));assert.ok(card.includes('AI 생성 상품 포함'));
 });
 
 test('skeletons only fill missing requested cards and additions retain the previous count', async()=>{

@@ -185,6 +185,10 @@ img { display: block; max-width: 100%; }
   background: var(--surface);
   box-shadow: inset 0 0 0 1px var(--line);
 }
+.lb-daily-card-rated .lb-look-ai-mark { top: 7px; bottom: auto !important; }
+@media (max-width: 359px) {
+  .lb-daily-card-compact-actions { padding-inline: 5px; }
+}
 @media (min-width: 560px) {
   .lb-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 14px; }
 }

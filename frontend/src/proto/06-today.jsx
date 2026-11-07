@@ -88,15 +88,24 @@ function ContextStrip({ selected, today, calOpen, setCalOpen, view, setView, onS
    TodayCard — 옷장 옷만으로 구성한 하루치 코디 (2꾭 그리드용 컴팩트)
    ============================================================ */
 // itemsById: 지난 날짜를 볼 때 그날의 아이템 스냅샷으로 그린다(옷장에서 지운 옷이어도 기록은 남게).
-function TodayCard({ outfit, saved, onSave, worn, onWear, wearLocked, styleLabel, onOpen, itemsById, looking, showModelLook = true, onMakeModelLook, aiMark = 'full' }) {
+function TodayCard({ outfit, saved, onSave, worn, onWear, wearLocked, styleLabel, onOpen, onExpand, onRate, compactActions, itemsById, looking, showModelLook = true, onMakeModelLook, aiMark = 'full' }) {
   const [useModelLook, setUseModelLook] = useTd(window.LOOK_IMAGE_MODES[outfit.id] !== false);
   const [confirmModelLook, setConfirmModelLook] = useTd(false);
   const items = (outfit.itemIds || []).map((id) => (itemsById && itemsById[id]) || LB_DATA.ALL[id]).filter(Boolean);
   const displayOutfit = (!showModelLook || !useModelLook) && items.some((item) => item.img)
     ? { ...outfit, lookImg: null }
     : outfit;
+  const actionSize = compactActions ? 22 : 24;
+  const actionInset = compactActions ? 5 : 7;
+  const actionStep = actionSize + (compactActions ? 3 : 2);
+  const actionStyle = {
+    position: 'absolute', bottom: actionInset, zIndex: 15, width: actionSize, height: actionSize,
+    padding: 0, border: 0, borderRadius: '50%', display: 'grid', placeItems: 'center',
+    background: 'color-mix(in srgb, var(--ink) 72%, transparent)', color: '#fff',
+    cursor: 'pointer', boxShadow: '0 0 0 1px rgba(255,255,255,0.12)',
+  };
   return (
-    <div className="lb-look-card lb-daily-card-reveal" style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+    <div className={'lb-look-card lb-daily-card-reveal' + (compactActions ? ' lb-daily-card-compact-actions' : '') + (onRate ? ' lb-daily-card-rated' : '')} style={{ display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
       {/* HERO — 조합 전체를 하나의 룩 이미지로, 상황 태그·저장은 오버레이 */}
       <div style={{ position: 'relative' }}>
         <div
@@ -112,9 +121,22 @@ function TodayCard({ outfit, saved, onSave, worn, onWear, wearLocked, styleLabel
             display: 'block', width: '100%', cursor: onOpen ? 'pointer' : 'default', textAlign: 'left', position: 'relative',
           }}
         >
-          <LookComposite outfit={displayOutfit} items={items} ratio="4 / 5" looking={looking} aiMark="icon" infoButton infoRight={59} infoSize={24} infoBottom={7} aiMarkSize={24} aiMarkInset={7} />
+          <LookComposite outfit={displayOutfit} items={items} ratio="4 / 5" looking={looking} aiMark="icon" infoButton infoRight={actionInset + 2 * actionStep} infoSize={actionSize} infoBottom={actionInset} aiMarkSize={24} aiMarkInset={7} />
         </div>
-        {onOpen && LookExpandBadge ? <button type="button" aria-label="크게 보기" title="크게 보기" onClick={() => onOpen(outfit)} style={{ position: 'absolute', right: 7, bottom: 7, width: 24, height: 24, padding: 0, border: 0, background: 'transparent', cursor: 'pointer', zIndex: 15 }}><LookExpandBadge size={24} inset={0} /></button> : null}
+        {(onExpand || onOpen) && LookExpandBadge ? <button type="button" aria-label="크게 보기" title="크게 보기"
+          onClick={() => onExpand ? onExpand(displayOutfit, items) : onOpen(outfit)}
+          style={{ ...actionStyle, right: actionInset, background: 'transparent', boxShadow: 'none' }}>
+          <LookExpandBadge size={actionSize} inset={0} />
+        </button> : null}
+        {onRate && [1, -1].map((vote, index) => {
+          const active = outfit.feedback === vote;
+          const label = vote === 1 ? '좋아요' : '별로예요';
+          return <button key={vote} type="button" onClick={() => onRate(vote)} aria-label={label} title={label} aria-pressed={active}
+            style={{ ...actionStyle, right: actionInset + (4 - index) * actionStep,
+              ...(active ? { background: 'var(--surface)', color: 'var(--ink)' } : {}) }}>
+            <Icon name="thumb" size={compactActions ? 12 : 13} stroke={2} fill={active ? 'currentColor' : 'none'} style={vote < 0 ? { transform: 'rotate(180deg)' } : undefined} />
+          </button>;
+        })}
         <button onClick={onSave} className="lb-save" title={saved ? '저장 취소' : '룩북에 저장'} aria-label={saved ? '룩북에서 빼기' : '룩북에 저장'} style={{
           position: 'absolute', right: 8, top: 8, width: 32, height: 32, borderRadius: '50%', display: 'grid', placeItems: 'center',
           color: saved ? 'var(--accent-ink)' : 'var(--ink)',
@@ -129,7 +151,7 @@ function TodayCard({ outfit, saved, onSave, worn, onWear, wearLocked, styleLabel
           const next = !useModelLook;
           window.LOOK_IMAGE_MODES[outfit.id] = next;
           setUseModelLook(next);
-        }} title={outfit.lookImg ? (useModelLook ? '상품컷 보기' : 'AI 착장 보기') : 'AI 착장 만들기'} aria-label={outfit.lookImg ? (useModelLook ? '상품컷 보기' : 'AI 착장 보기') : 'AI 착장 이미지 만들기'} style={{ position: 'absolute', right: 33, bottom: 7, zIndex: 15, width: 24, height: 24, border: 0, borderRadius: '50%', display: 'grid', placeItems: 'center', background: 'color-mix(in srgb, var(--ink) 72%, transparent)', color: '#fff', cursor: 'pointer', boxShadow: '0 0 0 1px rgba(255,255,255,0.12)' }}>
+        }} title={outfit.lookImg ? (useModelLook ? '상품컷 보기' : 'AI 착장 보기') : 'AI 착장 만들기'} aria-label={outfit.lookImg ? (useModelLook ? '상품컷 보기' : 'AI 착장 보기') : 'AI 착장 이미지 만들기'} style={{ ...actionStyle, right: actionInset + actionStep }}>
           <Icon name={outfit.lookImg && useModelLook ? "product" : "sparkle"} size={12} stroke={2.2} />
         </button>
         {createPortal(<BottomSheet open={confirmModelLook} onClose={() => setConfirmModelLook(false)} maxW={420} zIndex={120} centered>
@@ -361,7 +383,7 @@ function TodayRecommendationScreen({ ctx }) {
     dailyEnabled, setDailyEnabled,
     preferredDailyStyle, preferredStyleLabel,
     dailyWardrobeGrew, dailyTick,
-    getDayRecord, openDetail, refreshLive, showToast,
+    getDayRecord, openDetail, openOutfitViewer, rateOutfit, refreshLive, showToast,
     comboNeed, comboProgress,
     applyModelLooks,
   } = ctx;
@@ -610,7 +632,7 @@ function TodayRecommendationScreen({ ctx }) {
           : (
             <>
               {shown.map((o, i) => (
-                <TodayCard key={(isToday ? '' : ymd(selected) + '-') + o.id + '-' + i} outfit={{ ...o, cardTitle: `추천 코디 ${i + 1}` }}
+                <TodayCard key={(isToday ? '' : ymd(selected) + '-') + o.id + '-' + i} outfit={{ ...o, feedback: LB_DATA.OUTFIT_BY_ID[o.id]?.feedback ?? o.feedback, cardTitle: `추천 코디 ${i + 1}` }}
                   styleLabel={preferredStyleLabel}
                   saved={savedOutfitIds.includes(o.id)} onSave={() => toggleSaveOutfit(o.id)}
                   worn={isToday ? wornToday.includes(o.id) : pastWorn.includes(o.id)}
@@ -619,7 +641,13 @@ function TodayRecommendationScreen({ ctx }) {
                   itemsById={isToday ? null : pastItemsById}
                   showModelLook
                   onMakeModelLook={applyModelLooks}
-                  onOpen={openLook} />
+                  onOpen={openLook}
+                  onExpand={openOutfitViewer}
+                  compactActions={!wide}
+                  onRate={!rateOutfit || o.manual ? undefined : vote => {
+                    LB_DATA.OUTFIT_BY_ID[o.id] ||= o;
+                    rateOutfit(o.id, vote);
+                  }} />
               ))}
               {Array.from({ length: empty }).map((_, i) => (
                 <EmptyTodaySlot
