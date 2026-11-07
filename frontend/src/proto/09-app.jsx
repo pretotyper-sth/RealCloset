@@ -1554,8 +1554,8 @@ function App() {
     const first = (text.split(/(?<=[.!?])\s+/)[0] || text).replace(/\.$/, '');
     return first.length <= 22 ? first : first.slice(0, 21) + '…';
   };
-  const showToast = useCallback((msg, icon, { extended = false } = {}) => {
-    setToast({ msg: extended ? msg : shortToast(msg), icon });
+  const showToast = useCallback((msg, icon, { extended = false, flipIcon = false } = {}) => {
+    setToast({ msg: extended ? msg : shortToast(msg), icon, flipIcon });
     clearTimeout(toastT.current);
     toastT.current = setTimeout(() => setToast(null), extended ? 4000 : 1900);
   }, []);
@@ -2411,7 +2411,7 @@ function App() {
     (LB_DATA.OUTFITS || []).forEach((o) => { if (o && o.id === outfitId) o.feedback = feedback; });
     setDetailLook((cur) => cur && cur.outfitId === outfitId ? { ...cur, feedback } : cur);
     persistOutfitState(outfitId, { feedback });
-    showToast(feedback ? '다음 추천에 반영할게요' : '평가를 취소했어요', feedback === 1 ? 'thumb' : undefined);
+    showToast(feedback ? '다음 추천에 반영할게요' : '평가를 취소했어요', feedback ? 'thumb' : undefined, { flipIcon: feedback === -1 });
   };
   const renameSavedLook = (outfitId, name) => {
     const label = String(name || '').trim().slice(0, 40);
@@ -3299,7 +3299,7 @@ function App() {
 
       {toast && (
         <div className={'lb-toast show'} role="status">
-          {toast.icon && <Icon name={toast.icon} size={15} stroke={2.4} fill={toast.icon === 'bookmark' ? 'currentColor' : 'none'} />}
+          {toast.icon && <Icon name={toast.icon} size={15} stroke={2.4} style={toast.flipIcon ? { transform: 'rotate(180deg)' } : undefined} fill={toast.icon === 'bookmark' ? 'currentColor' : 'none'} />}
           {toast.msg}
         </div>
       )}
