@@ -1,6 +1,6 @@
 /* @prototype-ported */
 const React = window.React;
-const { AuthPage, Btn, Chip, Eyebrow, Icon, LB_DATA, NumberSlider, PALETTE, PERSONAL_COLORS, SmartImg, useEscapeClose, WARDROBE, Wordmark } = window;
+const { AuthPage, Btn, Chip, Eyebrow, Icon, LB_DATA, NumberSlider, PALETTE, PERSONAL_COLORS, Skeleton, SmartImg, useEscapeClose, WARDROBE, Wordmark } = window;
 
 /* global React, Btn, Chip, Icon, Wordmark, Eyebrow, LabeledField, Thumb, LB_DATA */
 // RealCloset — 회원가입 / 선호 정보 온보딩. 단계별(step) 흐름.
@@ -239,7 +239,12 @@ function Landing() {
               margin: '0 auto', alignSelf: 'center', touchAction: 'pan-y', userSelect: 'none',
             }}
           >
-            <div className="lb-hero-images" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, opacity: imagesReady ? 1 : 0 }}>
+            <div className="lb-hero-images" style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              {!imagesReady && (
+                <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  {[0, 1, 2, 3].map(slot => <Skeleton key={slot} h="100%" radius="var(--r-md)" />)}
+                </div>
+              )}
               <HeroTile img={anchor.img} name={anchor.name} anchor />
               {[0, 1, 2].map(slot => (
                 <div key={slot} style={{ position: 'relative', aspectRatio: '1 / 1' }}>

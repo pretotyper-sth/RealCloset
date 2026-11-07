@@ -11,20 +11,71 @@
     <title>RealCloset</title>
   </head>
   <body>
-    <div id="root">
+    <div id="root" data-boot="landing">
+      <script>
+        (() => {
+          const params = new URLSearchParams(location.search)
+          if (params.get('onboarding') === '1' || params.has('auth') || params.has('reset')) return
+          const root = document.getElementById('root')
+          if (params.has('screen') || params.has('style') || params.has('vote')) {
+            root.dataset.boot = 'home'
+            return
+          }
+          try {
+            const project = new URL('%VITE_SUPABASE_URL%').hostname.split('.')[0]
+            const session = JSON.parse(localStorage.getItem('sb-' + project + '-auth-token') || 'null')
+            if (!session?.access_token || !session?.refresh_token || !session?.user || session.user.is_anonymous) return
+            const prefs = session.user.user_metadata?.prefs
+            const social = session.user.identities?.some(identity => ['google', 'kakao'].includes(identity.provider))
+            if (social && !prefs?.onboardingComplete && !(prefs?.gender && prefs?.styles?.length && prefs?.fit)) return
+            root.dataset.boot = 'home'
+          } catch {}
+        })()
+      </script>
       <style>
-        .rc-boot { position: fixed; inset: 0; background: #efede8; padding: 28px max(18px, calc((100vw - 1120px) / 2)); }
-        .rc-boot-heading, .rc-boot-card { background: #e4e1d9; border-radius: 14px; }
-        .rc-boot-heading { width: 132px; height: 24px; margin-bottom: 24px; }
-        .rc-boot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .rc-boot-card { aspect-ratio: 4 / 5; }
-        @media (min-width: 760px) { .rc-boot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+        .rc-boot { position: fixed; inset: 0; background: #efede8; overflow: hidden; box-sizing: border-box; }
+        .rc-boot-shape { border-radius: 12px; background: #e1ded5; }
+        .rc-boot-landing { width: min(100%, 560px); height: 100%; margin: auto; padding: max(env(safe-area-inset-top), 14px) 20px max(env(safe-area-inset-bottom), 16px); box-sizing: border-box; display: flex; flex-direction: column; }
+        .rc-boot-logo { width: 104px; height: 20px; flex: none; }
+        .rc-boot-title { width: min(70%, 260px); height: 28px; margin: 29px 0 10px; flex: none; }
+        .rc-boot-copy { width: min(92%, 340px); height: 12px; margin-bottom: 7px; flex: none; }
+        .rc-boot-copy + .rc-boot-copy { width: min(78%, 275px); }
+        .rc-boot-hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; width: min(100%, max(120px, calc(100dvh - 360px))); margin: auto; }
+        .rc-boot-hero .rc-boot-shape { aspect-ratio: 1; }
+        .rc-boot-button { height: 46px; border-radius: 24px; margin-top: 8px; flex: none; }
+        .rc-boot-home { display: none; padding: 28px 18px; }
+        .rc-boot-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+        .rc-boot-grid .rc-boot-shape { aspect-ratio: 1; }
+        #root[data-boot="home"] .rc-boot-landing { display: none; }
+        #root[data-boot="home"] .rc-boot-home { display: block; }
+        @media (min-width: 760px) {
+          .rc-boot-home { padding-inline: 32px; margin-left: 244px; }
+          .rc-boot-home::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 243px; border-right: 1px solid #dfdbd1; }
+          .rc-boot-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+          .rc-boot-shape { background: linear-gradient(100deg, #e1ded5 30%, #f4f1e9 50%, #e1ded5 70%); background-size: 240% 100%; animation: rc-boot-shimmer 1.5s linear infinite; }
+          @keyframes rc-boot-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+        }
       </style>
       <div class="rc-boot" role="status" aria-label="RealCloset을 불러오는 중">
-        <div class="rc-boot-heading" aria-hidden="true"></div>
-        <div class="rc-boot-grid" aria-hidden="true">
-          <div class="rc-boot-card"></div><div class="rc-boot-card"></div>
-          <div class="rc-boot-card"></div><div class="rc-boot-card"></div>
+        <div class="rc-boot-landing" aria-hidden="true">
+          <div class="rc-boot-shape rc-boot-logo"></div>
+          <div class="rc-boot-shape rc-boot-title"></div>
+          <div class="rc-boot-shape rc-boot-copy"></div><div class="rc-boot-shape rc-boot-copy"></div>
+          <div class="rc-boot-hero">
+            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
+          </div>
+          <div class="rc-boot-shape rc-boot-button"></div><div class="rc-boot-shape rc-boot-button"></div>
+        </div>
+        <div class="rc-boot-home" aria-hidden="true">
+          <div class="rc-boot-shape rc-boot-logo"></div>
+          <div class="rc-boot-shape rc-boot-title"></div>
+          <div class="rc-boot-grid">
+            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
+          </div>
         </div>
       </div>
     </div>
