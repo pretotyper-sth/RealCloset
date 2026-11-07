@@ -290,16 +290,20 @@ function lookRectInCell(it, im, cell, w, h, scale) {
   return { im, x: cx - visibleCx * s, y: cy - visibleCy * s, dw: im.naturalWidth * s, dh: im.naturalHeight * s };
 }
 
-function flattenLookBoard(items, place, scale, ratio, pack) {
-  const w = 720;
+function flattenLookBoard(items, place, scale, ratio, fullResolution) {
+  const w = fullResolution ? 1440 : 720;
   const h = Math.round(w / parseLookRatio(ratio));
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
   ctx.fillStyle = '#E5E3DE';
   ctx.fillRect(0, 0, w, h);
-  return Promise.all(items.map((it) => loadLookImage(it.thumb || it.img))).then((images) => {
+  return Promise.all(items.map(async (it) => {
+    if (!fullResolution) return loadLookImage(it.thumb || it.img);
+    return await loadLookImage(it.img) || (it.thumb && it.thumb !== it.img ? loadLookImage(it.thumb) : null);
+  })).then((images) => {
     const safeCells = layerSafeCells(items);
     const layered = items.map((it, i) => ({ it, im: images[i], z: (place[it.id] || LOOK_SPOT.top).z }))
       .filter((x) => x.im)
@@ -335,12 +339,12 @@ function flattenLookBoard(items, place, scale, ratio, pack) {
 const LOOK_FLAT_CACHE = {};
 window.LOOK_IMAGE_MODES = window.LOOK_IMAGE_MODES || {};
 
-function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)', scale = LOOK_SCALE, looking, lined, pack = true, aiMark = 'full', copyButton = false, infoButton = false, infoRight = 8, infoSize = 28, infoBottom = 8, aiMarkSize, aiMarkInset = 8 }) {
+function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)', scale = LOOK_SCALE, looking, lined, aiMark = 'full', copyButton = false, infoButton = false, infoRight = 8, infoSize = 28, infoBottom = 8, aiMarkSize, aiMarkInset = 8, fullResolution = false }) {
   const cleanItems = (items || []).filter(Boolean);
   const shown = cleanItems.filter((it) => it.img);
   const place = lookPlacement(shown);
-  const key = shown.map((it) => String(it.id) + ':' + (it.thumb || it.img || '')).join('|') + '|flat19|' + ratio;
-  const [flat, setFlat] = useSc(LOOK_FLAT_CACHE[key] || '');
+  const key = shown.map((it) => String(it.id) + ':' + (fullResolution ? it.img : it.thumb || it.img)).join('|') + '|flat19|' + ratio;
+  const [flat, setFlat] = useSc(fullResolution ? '' : LOOK_FLAT_CACHE[key] || '');
   const [copyState, setCopyState] = useSc('');
   const [showInfo, setShowInfo] = useSc(false);
   const lookImg = outfit && outfit.lookImg;
@@ -350,17 +354,17 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
       setFlat('');
       return undefined;
     }
-    if (LOOK_FLAT_CACHE[key]) {
+    if (!fullResolution && LOOK_FLAT_CACHE[key]) {
       setFlat(LOOK_FLAT_CACHE[key]);
       return undefined;
     }
     let dead = false;
-    flattenLookBoard(shown, place, scale, ratio, pack).then((url) => {
-      if (url) LOOK_FLAT_CACHE[key] = url;
+    flattenLookBoard(shown, place, scale, ratio, fullResolution).then((url) => {
+      if (url && !fullResolution) LOOK_FLAT_CACHE[key] = url;
       if (!dead) setFlat(url);
     });
     return () => { dead = true; };
-  }, [key, scale, ratio, pack, !!(outfit && outfit.lookImg)]);
+  }, [key, scale, ratio, fullResolution, !!(outfit && outfit.lookImg)]);
 
   useEc(() => () => { if (copyTimer.current) clearTimeout(copyTimer.current); }, []);
   const copyImage = (event) => {
@@ -486,7 +490,11 @@ function LookComposite({ outfit, items, ratio = '4 / 5', bg = 'var(--thumb-bg)',
         };
         return (
           <div key={it.id} style={frame}>
-            <img src={it.thumb || it.img} alt={it.name} loading="lazy" decoding="async" style={{
+            <img src={fullResolution ? it.img : (it.thumb || it.img)} alt={it.name} loading={fullResolution ? 'eager' : 'lazy'}
+              onError={fullResolution && it.thumb && it.thumb !== it.img ? event => {
+                const image = event.currentTarget;
+                if (image.getAttribute('src') !== it.thumb) image.src = it.thumb;
+              } : undefined} decoding="async" style={{
               width: '100%', height: '100%', objectFit: 'contain', display: 'block',
             }} />
           </div>
@@ -858,7 +866,7 @@ function SavedCard({ look, onOpen, onMore, selected, showSel, onToggleSel, inSel
     <div className="lb-look-card" style={{ position: 'relative', minWidth: 0 }}>
       <div style={{ position: 'relative' }}>
         <button onClick={onOpen} className="lb-itembtn" style={{ display: 'block', width: '100%', textAlign: 'left', padding: 0 }}>
-          <LookComposite outfit={showModelLook ? outfit : { ...outfit, lookImg: null }} items={items} ratio="4 / 5" pack={false} aiMark="icon" />
+          <LookComposite outfit={showModelLook ? outfit : { ...outfit, lookImg: null }} items={items} ratio="4 / 5" aiMark="icon" />
         </button>
         {onToggleSel && (showSel || wide) && (
           <button

@@ -295,6 +295,19 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
     return z;
   };
 
+  const moveFrom = (x, y) => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const limit = (size) => size * (zoomRef.current / 2 - 0.15);
+    const clamp = (value, max) => Math.max(-max, Math.min(max, value));
+    const next = {
+      x: clamp(drag.current.ox + x - drag.current.x, limit(stage.clientWidth)),
+      y: clamp(drag.current.oy + y - drag.current.y, limit(stage.clientHeight)),
+    };
+    offsetRef.current = next;
+    setOffset(next);
+  };
+
   useEffect(() => {
     if (!open) return undefined;
     zoomRef.current = 1;
@@ -331,7 +344,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
         lastTap.current = 0;
         return;
       }
-      if (e.touches.length === 1 && zoomRef.current > 1) {
+      if (e.touches.length === 1 && !e.target.closest('button')) {
         const t = e.touches[0];
         drag.current = { x: t.clientX, y: t.clientY, ox: offsetRef.current.x, oy: offsetRef.current.y };
         setDragging(true);
@@ -347,12 +360,9 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
       if (drag.current && e.touches.length === 1) {
         e.preventDefault();
         const t = e.touches[0];
-        const next = {
-          x: drag.current.ox + (t.clientX - drag.current.x),
-          y: drag.current.oy + (t.clientY - drag.current.y),
-        };
-        offsetRef.current = next;
-        setOffset(next);
+        if (!drag.current.moved && Math.hypot(t.clientX - drag.current.x, t.clientY - drag.current.y) < 5) return;
+        drag.current.moved = true;
+        moveFrom(t.clientX, t.clientY);
       }
     };
     const endPinch = () => { pinch.current = null; setPinching(false); };
@@ -361,9 +371,12 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
         if (e.touches.length < 2) endPinch();
         return;
       }
-      if (drag.current) {
-        drag.current = null;
-        setDragging(false);
+      const moved = drag.current?.moved;
+      drag.current = null;
+      setDragging(false);
+      if (moved || e.type === 'touchcancel' || e.target.closest('button')) {
+        lastTap.current = 0;
+        return;
       }
       if (e.touches.length !== 0) return;
       const t = e.changedTouches && e.changedTouches[0];
@@ -409,8 +422,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
   const resetZoom = () => applyZoom(1);
 
   const onPointerDown = (e) => {
-    if (e.pointerType === 'touch') return;
-    if (zoomRef.current <= 1) return;
+    if (e.pointerType === 'touch' || e.button !== 0 || e.target.closest('button')) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
     drag.current = { x: e.clientX, y: e.clientY, ox: offsetRef.current.x, oy: offsetRef.current.y };
     setDragging(true);
@@ -418,12 +430,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
   const onPointerMove = (e) => {
     if (e.pointerType === 'touch') return;
     if (!drag.current) return;
-    const next = {
-      x: drag.current.ox + (e.clientX - drag.current.x),
-      y: drag.current.oy + (e.clientY - drag.current.y),
-    };
-    offsetRef.current = next;
-    setOffset(next);
+    moveFrom(e.clientX, e.clientY);
   };
   const onPointerUp = (e) => {
     if (e && e.pointerType === 'touch') return;
@@ -436,7 +443,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
     minWidth: 0, minHeight: 0, objectFit: 'contain', objectPosition: 'center',
     display: 'block', userSelect: 'none',
   };
-  const lookFill = !!(outfit && outfit.lookImg);
+  const outfitWidth = 'min(100%, calc((100dvh - max(env(safe-area-inset-top), 14px) - max(env(safe-area-inset-bottom), 18px) - 138px) * 0.8))';
   const media = isOutfit ? (
     outfit.lookImg ? (
       <div style={{ position: 'absolute', inset: 0, minWidth: 0, minHeight: 0 }}>
@@ -447,7 +454,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
           style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%',
             maxWidth: '100%', maxHeight: '100%', minWidth: 0, minHeight: 0,
-            objectFit: 'cover', objectPosition: 'center top', display: 'block',
+            objectFit: 'contain', objectPosition: 'center', display: 'block',
             userSelect: 'none',
           }}
         />
@@ -457,7 +464,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
       </div>
     ) : (Composite ? (
       <div style={{ width: '100%', height: '100%', minWidth: 0, minHeight: 0 }}>
-        <Composite outfit={outfit} items={outfitItems} ratio="4 / 5" infoButton />
+        <Composite outfit={outfit} items={outfitItems} ratio="4 / 5" infoButton fullResolution />
       </div>
     ) : null)
   ) : (
@@ -494,7 +501,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
-          flex: 'none', width: '100%', maxWidth: desktopViewer ? 900 : 440,
+          flex: 'none', width: isOutfit ? outfitWidth : '100%', maxWidth: desktopViewer ? 900 : 440,
           display: 'flex', alignItems: 'flex-start', gap: 10,
         }}
       >
@@ -532,17 +539,16 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
         onClick={(e) => e.stopPropagation()}
         style={{
           position: 'relative',
-          width: lookFill ? (desktopViewer ? 'min(86vw, calc(min(82vh, 1000px) * 0.8))' : 'min(100%, calc(min(72vh, 640px) * 0.8))') : '100%',
+          width: isOutfit ? outfitWidth : '100%',
           maxWidth: desktopViewer ? 'min(900px, 86vw)' : 440,
-          flex: lookFill ? 'none' : '1 1 auto',
-          aspectRatio: lookFill ? '4 / 5' : undefined,
-          height: lookFill ? 'auto' : undefined,
-          minHeight: 0, maxHeight: desktopViewer ? 'min(82vh, 1000px)' : 'min(72vh, 640px)',
+          flex: isOutfit ? 'none' : '1 1 auto',
+          aspectRatio: isOutfit ? '4 / 5' : undefined,
+          minHeight: 0, maxHeight: isOutfit ? undefined : (desktopViewer ? 'min(82vh, 1000px)' : 'min(72vh, 640px)'),
           background: '#E5E3DE', borderRadius: 'var(--r-lg)',
           boxShadow: '0 20px 48px rgba(0,0,0,0.35)',
           overflow: 'hidden',
           touchAction: 'none',
-          cursor: zoom > 1 ? (dragging ? 'grabbing' : 'grab') : 'default',
+          cursor: dragging ? 'grabbing' : 'grab',
         }}
       >
         <div
@@ -552,7 +558,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
           onPointerCancel={onPointerUp}
           onDoubleClick={(e) => {
             e.stopPropagation();
-            if (Date.now() - lastTap.current < 400) return;
+            if (e.target.closest('button') || Date.now() - lastTap.current < 400) return;
             if (zoomRef.current > 1) resetZoom();
             else applyZoom(2);
           }}
@@ -621,7 +627,7 @@ function ImageViewer({ open, item, outfit, items, onClose }) {
         flex: 'none', marginTop: -4, fontSize: 11.5,
         color: 'rgba(255,255,255,0.55)', textAlign: 'center',
       }}>
-        핀치 · 더블탭 · 휠로 확대할 수 있어요
+        드래그로 이동 · 핀치, 더블탭, 휠로 확대
       </div>
     </div>
   );
