@@ -387,15 +387,14 @@ function WardrobeScreen({ ctx }) {
     </div>
   );
 
-  const runPickedCoord = (externalOnly = false) => {
+  const runPickedCoord = () => {
     const picked = sel.map(id => LB_DATA.ALL[id]).filter(Boolean);
-    const missing = window.pickedMissingCategories(picked);
-    const guide = [window.pickedOutfitGuide(picked), !externalOnly && missing.length ? `${missing.join('·')}를 골라 주세요` : ''].filter(Boolean).join('\n\n');
+    const guide = window.pickedOutfitGuide(picked);
     if (guide) { setCoordGuide(guide); return; }
     const ids = sel.slice();
     exitSelectMode();
     setCoordGuide('');
-    if (requestPickedOutfits) requestPickedOutfits(ids, { externalOnly });
+    if (requestPickedOutfits) requestPickedOutfits(ids);
   };
 
   // 계절은 카테고리와 AND로 겹치는 부가 필터. 구분선 없이 '그리고' 라벨 + 살짝 옅은 글자색으로만 구분.
@@ -702,7 +701,6 @@ function WardrobeScreen({ ctx }) {
         <div className="lb-sheet-body" style={{ padding: '10px 24px 26px', textAlign: 'center' }}>
           <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700 }}>선택한 아이템을 확인해 주세요</h3>
           <ul style={{ margin: '21px 0 20px', paddingLeft: 20, textAlign: 'left', fontSize: 13.5, color: 'var(--ink-2)', lineHeight: 1.5, maxHeight: '45dvh', overflowY: 'auto' }}>{coordGuide.split('\n\n').map(issue => <li key={issue} style={{ marginBottom: 8 }}>{issue}</li>)}</ul>
-          {!window.pickedOutfitGuide(sel.map(id => LB_DATA.ALL[id]).filter(Boolean)) && <Btn full onClick={() => runPickedCoord(true)} style={{ marginBottom: 10 }}>나머지는 외부 아이템으로 추천받기</Btn>}
           <Btn full variant="soft" onClick={() => setCoordGuide('')}>선택 수정하기</Btn>
         </div>
       </BottomSheet>

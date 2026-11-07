@@ -231,12 +231,6 @@ function pickedOutfitGuide(picked) {
   return issues.join('\n\n');
 }
 window.pickedOutfitGuide = pickedOutfitGuide;
-function pickedMissingCategories(picked) {
-  const categories = new Set(picked.map(item => ({ top: '상의', outer: '아우터', bottom: '하의', skirt: '스커트', dress: '원피스' }[item.category] || item.category)));
-  if (categories.has('원피스')) return [];
-  return [!categories.has('상의') && !categories.has('아우터') && '상의', !categories.has('하의') && !categories.has('스커트') && '하의'].filter(Boolean);
-}
-window.pickedMissingCategories = pickedMissingCategories;
 function readPickedLookSettings(owner) {
   try { return JSON.parse(localStorage.getItem(`lb_picked_model_look_${owner || 'guest'}`)) || { enabled: false, confirmed: false }; }
   catch { return { enabled: false, confirmed: false }; }
