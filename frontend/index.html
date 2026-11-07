@@ -11,7 +11,23 @@
     <title>RealCloset</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .rc-boot { position: fixed; inset: 0; background: #efede8; padding: 28px max(18px, calc((100vw - 1120px) / 2)); }
+        .rc-boot-heading, .rc-boot-card { background: #e4e1d9; border-radius: 14px; }
+        .rc-boot-heading { width: 132px; height: 24px; margin-bottom: 24px; }
+        .rc-boot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .rc-boot-card { aspect-ratio: 4 / 5; }
+        @media (min-width: 760px) { .rc-boot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+      </style>
+      <div class="rc-boot" role="status" aria-label="RealCloset을 불러오는 중">
+        <div class="rc-boot-heading" aria-hidden="true"></div>
+        <div class="rc-boot-grid" aria-hidden="true">
+          <div class="rc-boot-card"></div><div class="rc-boot-card"></div>
+          <div class="rc-boot-card"></div><div class="rc-boot-card"></div>
+        </div>
+      </div>
+    </div>
     <script>
       window.addEventListener('vite:preloadError', (event) => {
         event.preventDefault()

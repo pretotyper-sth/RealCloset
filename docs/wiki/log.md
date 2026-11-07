@@ -1457,3 +1457,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-07: 피드 중복 조회를 제거하고 503 읽기 요청에 한정해 같은 세션으로 재시도한다. [인증 복구](auth-recovery-keepalive.md)
 
 - 2026-11-07: 코디 확대 화면은 4:5 전체를 중앙에 맞추고 원본 상품 이미지로 1440px 합성하며, 100%에서도 드래그를 허용한다. 근거: `frontend/src/proto/02-shared.jsx` ImageViewer, `frontend/src/proto/05-screens-cde.jsx` LookComposite.
+
+- 2026-11-07: 첫 HTML에 스켈레톤을 표시하고 화면 모듈을 함께 불러온다. 피드는 목록·계정 상태가 오면 표시하고 편집기는 열 때만 로드한다. 근거: `frontend/index.html`, `frontend/src/main.jsx`, `frontend/src/style/experience.jsx`.

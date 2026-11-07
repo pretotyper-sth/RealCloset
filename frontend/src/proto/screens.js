@@ -1,0 +1,10 @@
+// Keep registration order while letting the browser fetch the screens together.
+import './01-tweaks.jsx'
+import './02-shared.jsx'
+import './03-data.jsx'
+import './04-screens-ab.jsx'
+import './05-screens-cde.jsx'
+import './06-today.jsx'
+import './07-onboarding.jsx'
+import './08-mypage.jsx'
+import './10-tryon.jsx'

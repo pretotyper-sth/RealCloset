@@ -3065,7 +3065,7 @@ function App() {
       : null;
 
   const tabPane = (id, node) => (
-    mountedTabs[id] ? (
+    (mountedTabs[id] || tab === id) ? (
       <div
         key={id}
         style={{

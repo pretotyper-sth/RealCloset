@@ -40,14 +40,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   })
 }
 
-await import('./proto/01-tweaks.jsx')
-await import('./proto/02-shared.jsx')
-await import('./proto/03-data.jsx')
-await import('./proto/04-screens-ab.jsx')
-await import('./proto/05-screens-cde.jsx')
-await import('./proto/06-today.jsx')
-await import('./proto/07-onboarding.jsx')
-await import('./proto/08-mypage.jsx')
+await import('./proto/screens.js')
 
 // 로컬 전용: 익명 세션의 옷장·오늘 코디·룩북을 기준 계정 데이터로 채우고 토글 버튼을 띄운다.
 // LB_DATA(03-data)를 채운 뒤, App이 마운트되는 09-app 앞에서 실행돼야 한다.
@@ -56,7 +49,6 @@ if (import.meta.env.DEV && !['style','vote'].some(key=>new URLSearchParams(locat
 const styleExperience = await import('./style/experience.jsx')
 if (import.meta.env.DEV) await import('./style/closet-studio.jsx')
 
-await import('./proto/10-tryon.jsx')
 if (styleExperience && new URLSearchParams(location.search).has('vote')) {
   ReactDOM.createRoot(document.getElementById('root')).render(<styleExperience.SharedVotePage />)
 } else if (styleExperience && new URLSearchParams(location.search).has('style')) {
