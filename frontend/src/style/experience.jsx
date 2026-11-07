@@ -83,8 +83,8 @@ export function StyleExperience({ ctx }) {
   useEffect(()=>{if(!message)return;const t=setTimeout(()=>setMessage(''),3200);return()=>clearTimeout(t);},[message]);
   const load=async()=>{setLoading(true);setError('');try{const [a,b,c,d]=await Promise.all([api('/looks'),api('/feed'),api('/state'),api('/sample-reactions')]);setLooks(a.looks);setFeed(b.looks);setState({...EMPTY,...c});setSampleReactions(d.looks);}catch(e){setError(e.message);}finally{setLoading(false);}};
   useEffect(()=>{load();window.RC_PENDING_STYLE=null;const handler=()=>{setEditor(window.RC_PENDING_STYLE);window.RC_PENDING_STYLE=null;};window.addEventListener('rc-style-open',handler);return()=>window.removeEventListener('rc-style-open',handler);},[]);
-  useEffect(()=>{const update=()=>api('/state').then(x=>setState({...EMPTY,...x})).catch(e=>setError(e.message));window.addEventListener('rc-style-material-update',update);return()=>window.removeEventListener('rc-style-material-update',update);},[]);
-  useEffect(()=>{const refresh=()=>Promise.all([api('/feed'),api('/looks'),api('/state')]).then(([a,b,c])=>{setFeed(a.looks);setLooks(b.looks);setState({...EMPTY,...c});}).catch(e=>setError(e.message));window.addEventListener('rc-social-update',refresh);return()=>window.removeEventListener('rc-social-update',refresh);},[]);
+  useEffect(()=>{const update=()=>api('/state').then(x=>setState({...EMPTY,...x})).catch(()=>notify('만들기 재료를 새로 불러오지 못했어요.'));window.addEventListener('rc-style-material-update',update);return()=>window.removeEventListener('rc-style-material-update',update);},[]);
+  useEffect(()=>{const refresh=()=>Promise.all([api('/feed'),api('/looks'),api('/state')]).then(([a,b,c])=>{setFeed(a.looks);setLooks(b.looks);setState({...EMPTY,...c});setError('');}).catch(()=>notify('피드를 새로 불러오지 못했어요.'));window.addEventListener('rc-social-update',refresh);return()=>window.removeEventListener('rc-social-update',refresh);},[]);
   const save=async (look,{editing=false}={})=>{const next=await api(`/looks/${look.id}`,{method:'PUT',body:JSON.stringify({...look,privacy:look.privacy||'public',author:me.author})});socialChanged();setLooks(list=>[next,...list.filter(x=>x.id!==next.id)]);const f=await api('/feed').catch(()=>null);if(f)setFeed(f.looks);setSection('내 스타일');notify(editing?'수정했어요':next.privacy==='public'?'피드에 게시했어요':'공개 범위를 저장했어요');return next;};
   const commit=async next=>{const persisted=await api('/state',{method:'PUT',body:JSON.stringify(next)});setState({...EMPTY,...persisted});socialChanged();return persisted;};
   const bookmark=async look=>{const exists=state.collections.some(x=>x.type==='look'&&x.look.id===look.id);try{await commit({...state,collections:exists?state.collections.filter(x=>!(x.type==='look'&&x.look.id===look.id)):[{id:uid(),type:'look',look},...state.collections]});notify(exists?'피드 저장을 취소했어요':'저장했어요');}catch(e){setError(e.message);}};
@@ -101,7 +101,6 @@ export function StyleExperience({ ctx }) {
   const isOwnPost=look=>!!social?.creatorId&&!look.sample&&!!look.creatorId&&look.creatorId===social.creatorId;
 
   const visibleFeed=allFeed.filter(x=>!state.hidden.includes(x.id)&&(feedFilter==='all'||state.follows.includes(followId(x))));
-  useEffect(()=>{if(section==='발견')Promise.all([api('/feed'),api('/state')]).then(([data,current])=>{setFeed(data.looks);setState({...EMPTY,...current});}).catch(e=>setError(e.message));},[section,feedFilter]);
   const library=looks;
   const savedLooks=state.collections.filter(x=>x.type==='look');
 

@@ -210,7 +210,16 @@ function installFetchBridge() {
     }
     if (url.split('?')[0] === '/api/live/weather') return send(null)
     const token = await ensureToken()
-    const res = await send(token)
+    let res = await send(token)
+    // Read requests can recover from a temporary authentication outage without changing the session.
+    if ((init.method || input?.method || 'GET').toUpperCase() === 'GET') {
+      for (const delay of [450, 1200]) {
+        if (res.status !== 503) break
+        await new Promise(resolve => setTimeout(resolve, delay))
+        if (init.signal?.aborted || await ensureToken() !== token) return res
+        res = await send(token)
+      }
+    }
     // 401은 대부분 토큰이 죽은 것이다. 그냥 두면 탭을 열어둔 사이 세션이 만료됐을 때
     // 모든 요청이 계속 401로 떨어지고 화면이 빈 채로 남는다. 한 번만 다시 인증해 본다.
     if (res.status !== 401) return res

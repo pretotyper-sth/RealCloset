@@ -1453,3 +1453,5 @@ Vite 동적 모듈 로드 실패를 감지하면 세션당 한 번만 페이지�
 - 2026-11-02: 사용자 운영 배포 승인 후 30d1337 main push 및 Vercel Ready 확인. 최종 점검에서 조사와 붙어 있는 확장 안내/개인정보처리방침/수집기/API 오류 문구 표기와 Analytics 인증창 이름도 보정. Render GitHub 로그인은 배포용 계정이라는 오류로 실패, Google 로그인 전환은 자동 승인 검토에서 별도 승인 요구. Supabase 브라우저가 다른 계정으로 전환돼 SMTP 발신자명은 재확인 불가.
 
 - 2026-11-07: 공통 Wordmark에 Outfit 600과 RealCloset 표기를 적용했다. 근거: `frontend/src/proto/04-screens-ab.jsx:17`.
+
+- 2026-11-07: 피드 중복 조회를 제거하고 503 읽기 요청에 한정해 같은 세션으로 재시도한다. [인증 복구](auth-recovery-keepalive.md)
