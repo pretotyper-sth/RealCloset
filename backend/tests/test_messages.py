@@ -35,6 +35,9 @@ class DetailStringTest(unittest.TestCase):
             for key, text in table.items():
                 with self.subTest(msg=f"{name}.{key}"):
                     self.assertRegex(text, r"[가-힣]", "한국어여야 한다")
+                    if name == "_EXTRACT_FAIL_MSG" and key in {"auth", "quota", "bad_setup", "no_openai"}:
+                        self.assertEqual(text, "이미지 추출 실패")
+                        continue
                     self.assertTrue(text.endswith("."), f"문장으로 끝나야 한다: {text}")
                     # 다음 행동이 있어야 한다: 다시 시도 / 다른 사진 / 올려 주세요 …
                     self.assertRegex(

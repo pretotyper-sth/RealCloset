@@ -2509,7 +2509,6 @@ def generate_product_image(
 ) -> bytes | None:
     """이미지 + 프롬프트로 images.edit. 힌트면 사용자 문장 우선(ChatGPT와 동일)."""
     if not openai_client:
-        print("[extract] openai client missing", flush=True)
         meta["_extract_fail"] = "no_openai"
         return None
     if AI_TEST_MODE:
@@ -2652,7 +2651,6 @@ def generate_product_image(
             info = _openai_error_info(exc)
             meta["_extract_fail"] = "timeout" if isinstance(exc, APITimeoutError) else "network"
             meta["_extract_fail_info"] = info
-            print(f"[extract] timeout/conn model={model}: {_fail_log(info)}", flush=True)
             break
         except Exception as exc:  # noqa: BLE001
             info = _openai_error_info(exc)
@@ -2669,33 +2667,22 @@ def generate_product_image(
                         protect_light_garment=whiteish,
                         category=meta.get("category"),
                     )
+                except (APITimeoutError, APIConnectionError) as exc2:
+                    info = _openai_error_info(exc2)
+                    key = "timeout" if isinstance(exc2, APITimeoutError) else "network"
                 except Exception as exc2:  # noqa: BLE001
                     info = _openai_error_info(exc2)
                     key = _openai_fail_key(info)
+            if meta.get("_extract_mode") in ("ai", "ai_opaque"):
+                key = "cutout_processing"
             retryable = key in ("rate_limit", "upstream")
             if retryable and attempt == 0 and (time.monotonic() - started) < 45:
-                print(f"[extract] retry after {_fail_log(info)}", flush=True)
+                print(f"[extract] retry model={model} reason={key} status={info.get('status')}", flush=True)
                 time.sleep(3)
                 continue
             meta["_extract_fail"] = key
             meta["_extract_fail_info"] = info
-            print(f"[extract] edit failed model={model}: {_fail_log(info)}", flush=True)
             break
-    # 실패도 남긴다 — 라이브에서 어떤 에러였는지 로그 없이 확인할 수 있어야 한다.
-    log_ai_usage(
-        user_id,
-        "product_image_error",
-        model,
-        {
-            "quality": quality,
-            "tier": policy.get("tier"),
-            "fail": meta.get("_extract_fail"),
-            "error": meta.get("_extract_fail_info") or {},
-            "extract_hint": hint[:80],
-            "has_text_logo": has_text,
-        },
-    )
-    meta["_extract_fail"] = meta.get("_extract_fail") or "edit_failed"
     return None
 
 
@@ -2803,6 +2790,34 @@ _TRYON_FAIL_MSG = {
 }
 
 
+def _record_product_image_failure(
+    user_id: str, meta: dict[str, Any], reason: str, stage: str,
+    started: float, info: dict[str, Any],
+) -> None:
+    policy = meta.get("_extract_policy") or {}
+    model = policy.get("model") or ("none" if reason == "no_openai" else OPENAI_IMAGE_MODEL)
+    entry = {
+        "failed_at": now_iso(),
+        "fail": reason,
+        "stage": stage,
+        "duration_ms": int((time.monotonic() - started) * 1000),
+        "model": model,
+        "mode": meta.get("_extract_mode"),
+        "quality": policy.get("quality"),
+        "tier": policy.get("tier"),
+        "error": {
+            field: info[field]
+            for field in ("type", "status", "code", "param", "request_id")
+            if info.get(field) is not None
+        },
+    }
+    print(f"[extract] product_image_error {json.dumps(entry, ensure_ascii=False)}", flush=True)
+    try:
+        log_ai_usage(user_id, "product_image_error", model, entry)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[extract] diagnostic save failed type={type(exc).__name__}", flush=True)
+
+
 def resolve_product_image(
     user_id: str,
     path: str,
@@ -2811,19 +2826,26 @@ def resolve_product_image(
     report: Callable[[str], None] | None = None,
 ) -> bytes | None:
     """AI 추출. 실패한 결과를 색상 기반 로컬 컷아웃으로 덮어쓰지 않는다."""
-    hint = str(meta.get("extract_hint") or "").strip()
-    product = generate_product_image(user_id, path, meta, triage)
-    if product:
-        if report:
-            report("polish")
-        category = meta.get("category")
-        studio_garment = meta.get("_extract_mode") == "studio_cutout" and category in _ALPHA_SMOOTH_STRONG
-        if studio_garment:
-            product = _polish_cutout_alpha(product, category)
-        normalized = normalize_product_canvas(product, category)
-        if studio_garment:
-            normalized = _polish_cutout_alpha(normalized, category)
-        return normalized
+    started = time.monotonic()
+    stage = "generate"
+    try:
+        product = generate_product_image(user_id, path, meta, triage)
+        if product:
+            stage = "normalize"
+            if report:
+                report("polish")
+            category = meta.get("category")
+            studio_garment = meta.get("_extract_mode") == "studio_cutout" and category in _ALPHA_SMOOTH_STRONG
+            if studio_garment:
+                product = _polish_cutout_alpha(product, category)
+            normalized = normalize_product_canvas(product, category)
+            if studio_garment:
+                normalized = _polish_cutout_alpha(normalized, category)
+            return normalized
+    except Exception as exc:  # noqa: BLE001
+        _record_product_image_failure(user_id, meta, "processing_error", stage, started, {"type": type(exc).__name__})
+        raise
+
     fail = meta.get("_extract_fail") or "edit_failed"
     msg = _EXTRACT_FAIL_MSG.get(fail, _EXTRACT_FAIL_MSG["edit_failed"])
     info = meta.get("_extract_fail_info") or {}
@@ -2832,7 +2854,8 @@ def resolve_product_image(
         msg = f"{msg} (코드: {_fail_code(info)})"
     # 흰 옷·저대비 원단은 로컬 색상 제거로 대체하면 결과가 빠르게 나와도 일부가
     # 사라질 수 있다. 원본은 이미 보관되어 있으므로 안전하게 실패를 돌려준다.
-    print(f"[extract] failed ({fail}) — preserve original, no local fallback :: {_fail_log(info)}", flush=True)
+    stage = "finalize_cutout" if fail == "cutout_processing" else stage
+    _record_product_image_failure(user_id, meta, fail, stage, started, info)
     status = 504 if fail in ("timeout", "network") else (429 if fail == "rate_limit" else 502)
     raise HTTPException(status_code=status, detail=msg)
 

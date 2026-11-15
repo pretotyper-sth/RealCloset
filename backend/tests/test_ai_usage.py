@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import ast
+from contextlib import redirect_stdout
+import io
+import time
 import json
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from datetime import datetime, timezone, timedelta
-from typing import Any
+from typing import Any, Callable
 from unittest.mock import MagicMock
 
 from backend.app.ai_usage import UsageLedger, call_ai, estimate_cost, tokens_from_usage
@@ -137,3 +142,62 @@ class AiUsageTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class ProductImageFailureLogTest(unittest.TestCase):
+    def setUp(self):
+        source = Path(__file__).parents[1].joinpath("app/main.py").read_text()
+        names = {"now_iso", "_record_product_image_failure", "resolve_product_image", "_EXTRACT_FAIL_MSG"}
+        nodes = [
+            node for node in ast.parse(source).body
+            if getattr(node, "name", None) in names
+            or (isinstance(node, ast.Assign) and getattr(node.targets[0], "id", None) in names)
+        ]
+
+        class HTTPError(Exception):
+            def __init__(self, status_code, detail):
+                self.status_code = status_code
+                self.detail = detail
+
+        self.rows = []
+        self.ns = {
+            "Any": Any, "Callable": Callable, "datetime": datetime, "timezone": timezone,
+            "json": json, "time": time, "OPENAI_IMAGE_MODEL": "test-image",
+            "HTTPException": HTTPError, "SHOW_ERROR_CODES": False,
+            "log_ai_usage": lambda *args: self.rows.append(args),
+        }
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), "<main>", "exec"), self.ns)
+
+    def test_same_short_copy_keeps_distinct_timestamped_diagnostics(self):
+        for reason, info in (
+            ("no_openai", {}),
+            ("auth", {"status": 401, "code": "invalid_api_key", "request_id": "req-1"}),
+            ("quota", {"status": 429, "code": "insufficient_quota"}),
+            ("bad_setup", {"status": 400, "param": "background"}),
+        ):
+            with self.subTest(reason=reason):
+                def fail(_uid, _path, meta, _triage):
+                    meta.update(_extract_fail=reason, _extract_fail_info={**info, "message": "private"})
+                self.ns["generate_product_image"] = fail
+                output = io.StringIO()
+                with redirect_stdout(output), self.assertRaises(self.ns["HTTPException"]) as err:
+                    self.ns["resolve_product_image"]("user", "image.png", {})
+                self.assertEqual(err.exception.detail, "이미지 추출 실패")
+                _, feature, model, record = self.rows[-1]
+                self.assertEqual(feature, "product_image_error")
+                self.assertEqual(model, "none" if reason == "no_openai" else "test-image")
+                self.assertEqual(record["fail"], reason)
+                self.assertEqual(record["error"], info)
+                self.assertEqual(datetime.fromisoformat(record["failed_at"]).utcoffset(), timedelta(0))
+                self.assertGreaterEqual(record["duration_ms"], 0)
+                self.assertEqual(json.loads(output.getvalue().split("product_image_error ", 1)[1]), record)
+        self.assertEqual(len(self.rows), 4)
+
+    def test_normalization_failure_is_logged_and_reraised(self):
+        self.ns["generate_product_image"] = lambda *_: b"image"
+        self.ns["normalize_product_canvas"] = MagicMock(side_effect=ValueError("private"))
+        with redirect_stdout(io.StringIO()), self.assertRaises(ValueError):
+            self.ns["resolve_product_image"]("user", "image.png", {})
+        record = self.rows[-1][-1]
+        self.assertEqual((record["stage"], record["fail"]), ("normalize", "processing_error"))
+        self.assertEqual(record["error"], {"type": "ValueError"})

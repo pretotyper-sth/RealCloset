@@ -50,3 +50,13 @@ Supabase ai_usage_logs 전체를 1,000건 단위로 조회: 417건, 2026-07-05 2
 SQLite outbox에 먼저 기록하고 Supabase에 동일 ID로 upsert한다. 클라우드 시작 기록 실패 시 유료 요청은 보내지 않는다. 완료 저장 실패는 outbox에서 30초마다 재전송한다. 운영에서 `AI_USAGE_OUTBOX_PATH`를 영구 디스크에 지정하면 서버 교체 시에도 미전송 완료 기록을 복구할 수 있다. 미지정 기본은 `backend/.local/ai-usage.sqlite3`; 임시 디스크가 사라지면 시작 기록은 Supabase에 남지만 완료 토큰은 미확정으로 남을 수 있다.
 
 관리자 비용 API는 전체 페이지 조회·KST 기준 날짜·진단 이벤트 제외·비용 미확정 건수·동기화 대기 건수를 반환한다. 과거 누락 사용량은 새 로깅으로 복구되지 않는다. 관련 테스트 47개 통과; 전체 테스트 실패 18/오류 8은 수정 전 기준에서도 동일 목록으로 재현.
+
+## 상품 이미지 추출 실패
+
+서버 로그에서 `[extract] product_image_error`를 검색하거나 `ai_usage_logs`에서
+`feature = 'product_image_error'`를 조회한다. UTC `failed_at`과 `duration_ms`,
+실패 종류 `fail`, 처리 단계 `stage`, 제공사 상태·오류 코드·요청 ID가 있으면 함께 남는다.
+키 미설정(`no_openai`), 인증(`auth`), 할당량(`quota`), 요청 설정(`bad_setup`)은
+화면에서 같은 짧은 문구를 사용하며 로그에서 구분한다. 분류된 최종 실패 건을 기록하고
+AI 호출별 기록은 기존 `product_image`를 사용한다.
+근거: `backend/app/main.py`의 `_record_product_image_failure`, `resolve_product_image`.
