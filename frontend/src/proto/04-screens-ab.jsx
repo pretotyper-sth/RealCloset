@@ -2774,7 +2774,9 @@ function AddSheet({ ctx }) {
                                 <span style={{ flex: 1, minWidth: 0, color: 'var(--ink-2)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                   {x.name || x.url}
                                 </span>
-                                <span style={{ flex: 'none', color: '#B0573C' }}>{String(x.error || '실패').slice(0, 22)}</span>
+                                <span style={{ flex: 'none', maxWidth: '50%', color: '#B0573C', textAlign: 'right', wordBreak: 'keep-all', overflowWrap: 'anywhere' }}>
+                                  {x.error || '실패'}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -2855,7 +2857,7 @@ function AddSheet({ ctx }) {
                                   <span style={{
                                     flex: 'none', maxWidth: '38%', fontSize: 11.5, fontWeight: 600,
                                     color: b.state === 'fail' ? '#B0573C' : 'var(--ink-3)',
-                                    textAlign: 'right',
+                                    textAlign: 'right', wordBreak: 'keep-all', overflowWrap: 'anywhere',
                                   }}>
                                     {status}
                                   </span>
