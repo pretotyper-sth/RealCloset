@@ -51,18 +51,17 @@
         #root[data-boot="home"] .rc-boot-landing { display: none; }
         #root[data-boot="home"] .rc-boot-home { display: block; }
         @media (min-width: 760px) {
-          .rc-boot-home { padding-inline: 32px; margin-left: 244px; }
-          .rc-boot-home::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 243px; border-right: 1px solid #dfdbd1; }
-          .rc-boot-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+          .rc-boot-home { padding-inline: 32px; margin-left: 248px; }
+          .rc-boot-home::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 247px; border-right: 1px solid #dfdbd1; }
+          .rc-boot-grid { grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); gap: 22px 15px; }
         }
         #root[data-boot-tab="feed"] .rc-boot-grid { grid-template-columns: minmax(0, 1fr); }
         #root[data-boot-tab="feed"] .rc-boot-grid .rc-boot-shape,
         #root[data-boot-tab="today"] .rc-boot-grid .rc-boot-shape,
         #root[data-boot-tab="lookbook"] .rc-boot-grid .rc-boot-shape { aspect-ratio: 4 / 5; }
-        #root[data-boot-tab="feed"] .rc-boot-grid .rc-boot-shape { max-height: 640px; }
         #root[data-boot-tab="today"] .rc-boot-grid,
         #root[data-boot-tab="lookbook"] .rc-boot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        #root:is([data-boot-tab="mypage"], [data-boot-tab="decision"]) .rc-boot-grid { display: block; max-width: 680px; }
+        #root:is([data-boot-tab="mypage"], [data-boot-tab="decision"]) .rc-boot-grid { display: block; }
         #root:is([data-boot-tab="mypage"], [data-boot-tab="decision"]) .rc-boot-grid .rc-boot-shape { aspect-ratio: auto; height: 52px; margin-bottom: 12px; }
         @media (min-width: 760px) {
           #root:is([data-boot-tab="feed"], [data-boot-tab="today"], [data-boot-tab="lookbook"]) .rc-boot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -71,6 +70,26 @@
           #root[data-boot-tab="feed"] .rc-boot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
           #root:is([data-boot-tab="today"], [data-boot-tab="lookbook"]) .rc-boot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         }
+        @media (min-width: 760px) {
+          .rc-boot-home { padding-top: 28px; padding-bottom: 36px; }
+          .rc-boot-home > .rc-boot-logo { display: none; }
+          .rc-boot-home > .rc-boot-title { margin: 0 0 28px; height: 30px; }
+          #root[data-boot-tab="feed"] .rc-boot-grid { gap: 36px 24px; margin-top: 143px; }
+        }
+        @media (min-width: 1380px) {
+          #root[data-boot-tab="feed"] .rc-boot-grid { gap: 40px 28px; }
+        }
+        @media (min-width: 1500px) {
+          #root[data-boot-tab="wardrobe"] .rc-boot-grid { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 24px 16px; }
+        }
+        @media (min-width: 1600px) { .rc-boot-home { padding-inline: 40px; } }
+        @media (min-width: 1900px) {
+          #root[data-boot-tab="feed"] .rc-boot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (min-width: 2000px) {
+          #root[data-boot-tab="wardrobe"] .rc-boot-grid { grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 26px 18px; }
+        }
+        @media (min-width: 2200px) { .rc-boot-home { padding-inline: 56px; } }
         @media (prefers-reduced-motion: no-preference) {
           .rc-boot-shape { background: linear-gradient(100deg, #e1ded5 30%, #f4f1e9 50%, #e1ded5 70%); background-size: 240% 100%; animation: rc-boot-shimmer 1.5s linear infinite; }
           @keyframes rc-boot-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
@@ -91,8 +110,22 @@
           <div class="rc-boot-shape rc-boot-logo"></div>
           <div class="rc-boot-shape rc-boot-title"></div>
           <div class="rc-boot-grid">
-            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
-            <div class="rc-boot-shape"></div><div class="rc-boot-shape"></div><div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
+            <div class="rc-boot-shape"></div>
           </div>
         </div>
       </div>

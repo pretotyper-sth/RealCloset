@@ -3,8 +3,17 @@
 .rc-feed-skeleton-stream{grid-template-columns:1fr}
 .rc-feed-skeleton-profile{grid-template-columns:repeat(3,minmax(0,1fr))}
 .rc-feed-skeleton-single{grid-template-columns:1fr;max-width:620px;margin:16px auto;width:100%}
-@media(min-width:760px){.rc-feed-skeleton-stream{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:760px){
+ .rc-feed-skeleton-grid{gap:28px 20px;margin-top:14px}
+ .rc-feed-skeleton-stream{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 24px;margin-top:0}
+ .rc-feed-skeleton-author{display:flex;align-items:center;gap:8px;min-height:48px;padding:8px 0 12px;margin-bottom:-12px}
+}
 @media(min-width:1000px){.rc-feed-skeleton-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(min-width:1380px){.rc-feed-skeleton-stream{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1380px){.rc-feed-skeleton-stream{grid-template-columns:repeat(3,minmax(0,1fr));gap:40px 28px}}
 @media(min-width:1900px){.rc-feed-skeleton-stream{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:759px){.rc-feed>.rc-feed-layout>.rc-feed-skeleton,.rc-feed>.rc-feed-layout>.rc-feed-main>.rc-feed-skeleton{margin-inline:18px}.rc-feed-skeleton-stream{margin-inline:18px}}
+
+.rc-feed-skeleton-author{display:flex;align-items:center;gap:8px}
+.rc-feed-skeleton-people{grid-template-columns:1fr;gap:0;margin:0;width:100%}
+.rc-feed-skeleton-people .rc-feed-skeleton-card{flex-direction:row;align-items:center;gap:14px;min-height:101px;border-bottom:1px solid var(--line);padding:16px 0}
+.rc-feed-skeleton-people .rc-feed-skeleton-card>:last-child{margin-left:auto}

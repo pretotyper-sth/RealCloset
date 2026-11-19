@@ -104,3 +104,4 @@ link with `[[page-name]]` · append every operation to [log.md](log.md).
 - Social-only entry and email login removal: [social-login](social-login.md), [design-system](design-system.md).
 
 - [brand-name](brand-name.md) — 공식 표기 RealCloset·단일 워드마크·GitHub/Supabase 이름·RC 아이콘 유지
+- 데스크톱 반응형: [design-system](design-system.md) — 전체 폭·공통 타이틀 위치·피드 및 사람 목록/초기 스켈레톤 정렬.

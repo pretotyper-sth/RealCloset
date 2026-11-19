@@ -817,9 +817,10 @@ img { display: block; max-width: 100%; }
    뺀 1672 중 1080만 쓰고 좌우로 296px씩 버렸다 — 타이틀이 화면 가운데 어딘가에서
    시작하고 오른쪽은 빈 채로 남는다. 폭을 풀어 좌측에 붙이고 남는 폭은 그리드가
    auto-fill로 카드를 더 채워 쓴다. 여백은 화면이 커질수록 조금만 넓힌다. */
-.lb-wide-inner { width: 100%; margin: 0; padding: 0 32px; }
-@media (min-width: 1600px) { .lb-wide-inner { padding: 0 40px; } }
-@media (min-width: 2200px) { .lb-wide-inner { padding: 0 56px; } }
+:root { --page-gutter: 32px; }
+@media (min-width: 1600px) { :root { --page-gutter: 40px; } }
+@media (min-width: 2200px) { :root { --page-gutter: 56px; } }
+.lb-wide-inner { width: 100%; margin: 0; padding: 0 var(--page-gutter); }
 
 /* ---- 큰 화면 대응 ----
    로그인 전 화면(랜딩·로그인·온보딩)은 세로를 flex spacer로 나눠 쓴다. 폰에서는 그게

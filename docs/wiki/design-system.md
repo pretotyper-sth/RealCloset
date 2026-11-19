@@ -59,3 +59,15 @@ SocialLoginButtons in 07-onboarding.jsx is shared by landing, callback login and
 ## 워드마크 — 2026-11-02
 
 `Wordmark`는 `RealCloset` 단일 텍스트, Helvetica Neue/서비스 글꼴, weight 500을 쓴다. Real/Closet을 배지로 분리하지 않는다. 기존 size/onClick/키보드 접근성/높이를 유지한다. [[brand-name]].
+
+## 데스크톱 전체 폭과 페이지 전환
+
+공통 좌우 여백은 `proto.css`의 `--page-gutter`를 사용한다. 760px 이상에서 32px,
+1600px 이상에서 40px, 2200px 이상에서 56px이다. 피드·검색·알림·팔로워·팔로잉은
+목록 최대 폭과 중앙 정렬을 제거하고 이 여백을 공유한다. 페이지 타이틀은 위 28px,
+높이 30px로 맞추며 하위 페이지의 뒤로 가기는 타이틀 왼쪽 여백에 둔다.
+
+`feed-skeleton.css`는 피드와 같은 2·3·4열 및 간격을 사용하고, 사람 목록은
+`FeedSkeleton layout="people"`로 실제 행 높이와 전체 폭을 따른다. 최초 부팅
+`index.html`도 사이드바 248px, 같은 좌우 여백과 피드 4열 분기점을 사용한다.
+390·1440·1920·2560·3440px 로컬 미리보기에서 가로 넘침을 확인했다.
